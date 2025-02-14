@@ -1,14 +1,15 @@
 package TermProject;
 
 import java.io.FileNotFoundException;
-import java.sql.SQLOutput;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.io.File;
 import java.util.Scanner;
 
 public class World
 {
+    private static final int NAME_INDEX = 0;
+    private static final int CAPITAL_INDEX = 1;
+
     private static final int MAX_FACTS = 3;
     private static final int FIRST_FACT = 0;
     private static final int SECOND_FACT = 1;
@@ -37,22 +38,45 @@ public class World
 
                 Scanner reader;
                 reader = new Scanner(countryFile);
-                reader.useDelimiter(":");
 
-                while (reader.hasNext())
+                while (reader.hasNextLine())
                 {
                     Country newCountry;
+                    String nameAndCapitalLine;
                     String name;
                     String capital;
-                    String[] facts = new String[MAX_FACTS];
+                    String[] facts;
+                    String[] nameAndCapital;
 
-                    name = reader.next();
-                    capital = reader.next();
-                    facts[FIRST_FACT] = reader.next();
-                    facts[SECOND_FACT] = reader.next();
-                    facts[THIRD_FACT] = reader.next();
+                    nameAndCapitalLine = reader.nextLine();
+                    if (nameAndCapitalLine.isBlank())
+                    {
+                        continue;
+                    }
 
-                    System.out.println(name + "\n" + capital + "\n" + facts[FIRST_FACT] + "\n" + facts[SECOND_FACT] + "\n" + facts[THIRD_FACT]);
+                    nameAndCapital = nameAndCapitalLine.split(":");
+                    if (nameAndCapital.length != 2)
+                    {
+                        System.out.println("Invalid format in file: " + currentFile);
+                        continue;
+                    }
+
+                    name = nameAndCapital[NAME_INDEX];
+                    capital = nameAndCapital[CAPITAL_INDEX];
+
+                    facts = new String[MAX_FACTS];
+                    for (int j = 0; j < MAX_FACTS; j++)
+                    {
+                        if (reader.hasNextLine())
+                        {
+                            facts[j] = reader.nextLine().trim();
+                        } else
+                        {
+                            facts[j] = ""; // Handle missing facts
+                        }
+                    }
+
+                    //System.out.println(name + ": " + capital + "\n" + facts[FIRST_FACT] + "\n" + facts[SECOND_FACT] + "\n" + facts[THIRD_FACT] + "\n");
 
                     newCountry = new Country(name, capital, facts);
                     this.countries.put(name, newCountry);
@@ -61,23 +85,9 @@ public class World
 
             } catch (FileNotFoundException e)
             {
-                System.out.println("An error occurred.");
+                System.out.println("File not found: " + currentFile);
                 e.printStackTrace();
             }
         }
-    }
-
-    private static HashMap<String, Country> populateWorld()
-    {
-        HashMap<String, Country> countries = new HashMap<String, Country>();
-
-
-
-        return countries;
-    }
-
-    private static void ScanCountryFile()
-    {
-
     }
 }

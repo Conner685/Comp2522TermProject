@@ -25,8 +25,7 @@ public class Main
             {
                 case "w" ->
                 {
-                    System.out.println("Working");
-                    World world = new World();
+                    WordGame.wordGameMenu();
                 }
                 case "n" -> System.out.println("Working2");
                 case "m" -> System.out.println("Working3");
