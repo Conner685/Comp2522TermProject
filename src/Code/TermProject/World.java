@@ -3,6 +3,7 @@ package TermProject;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.io.File;
+import java.util.Random;
 import java.util.Scanner;
 
 public class World
@@ -11,9 +12,6 @@ public class World
     private static final int CAPITAL_INDEX = 1;
 
     private static final int MAX_FACTS = 3;
-    private static final int FIRST_FACT = 0;
-    private static final int SECOND_FACT = 1;
-    private static final int THIRD_FACT = 2;
 
     private final HashMap<String, Country> countries;
 
@@ -89,5 +87,20 @@ public class World
                 e.printStackTrace();
             }
         }
+    }
+
+    public Country selectRandCountry()
+    {
+        final Country[] countryArray;
+        final Country country;
+        final Random randomizer;
+
+        countryArray = this.countries.values().toArray(new Country[0]);
+
+        randomizer = new Random();
+
+        country = countryArray[randomizer.nextInt(this.countries.size())];
+
+        return country;
     }
 }

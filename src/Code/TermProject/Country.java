@@ -62,7 +62,6 @@ public class Country
         {
             throw new IllegalArgumentException("Invalid array index");
         }
-
         return this.facts[index];
     }
 }
