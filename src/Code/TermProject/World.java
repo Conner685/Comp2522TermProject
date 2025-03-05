@@ -8,17 +8,17 @@ import java.util.Scanner;
 
 public class World
 {
-    private static final int NAME_INDEX = 0;
-    private static final int CAPITAL_INDEX = 1;
+    private static final int NAME_INDEX     = 0;
+    private static final int CAPITAL_INDEX  = 1;
 
-    private static final int MAX_FACTS = 3;
+    private static final int MAX_FACTS      = 3;
 
     private final HashMap<String, Country> countries;
 
     public World()
     {
 
-        this.countries = new HashMap<String, Country>();
+        this.countries = new HashMap<>();
 
         for (char i = 'a'; i <= 'z'; i++)
         {
@@ -84,7 +84,6 @@ public class World
             } catch (FileNotFoundException e)
             {
                 System.out.println("File not found: " + currentFile);
-                e.printStackTrace();
             }
         }
     }

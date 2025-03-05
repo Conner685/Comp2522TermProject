@@ -1,24 +1,25 @@
 package TermProject;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.Scanner;
 
 public class WordGame
 {
-    private static final int INITIAL_STAT = 0;
+    private static final int INITIAL_STAT   = 0;
 
-    private static final int FIRST_TRY_PTS = 2;
+    private static final int FIRST_TRY_PTS  = 2;
     private static final int SECOND_TRY_PTS = 1;
     private static final int TOTAL_ATTEMPTS = 2;
 
-    private static final int TOTAL_QUESTIONS = 10;
-    private static final int TOTAL_QUESTION_TYPES = 3;
-    private static final int TOTAL_ANSWERS = 3;
-    private static final int TOTAL_FACTS = 3;
-    private static final int FIRST_ANS = 0;
-    private static final int SECOND_ANS = 1;
-    private static final int THIRD_ANS = 2;
-    private static final int ANS_INDEX_SHIFT = 1;
+    private static final int TOTAL_QUESTIONS        = 10;
+    private static final int TOTAL_QUESTION_TYPES   = 3;
+    private static final int TOTAL_ANSWERS          = 3;
+    private static final int TOTAL_FACTS            = 3;
+    private static final int FIRST_ANS              = 0;
+    private static final int SECOND_ANS             = 1;
+    private static final int THIRD_ANS              = 2;
+    private static final int ANS_INDEX_SHIFT        = 1;
 
     private static final World COUNTRIES = new World();
     private static final Scanner INPUTSCANNER = new Scanner(System.in);
@@ -84,8 +85,17 @@ public class WordGame
                 session.playWordGame();
             } else
             {
+                Score sessionResults;
+
+                sessionResults = new Score(LocalDateTime.now(),
+                                        session.gamesPlayed,
+                                        session.firstTryAns,
+                                        session.secondTryAns,
+                                        session.incorrectAns);
+
                 System.out.println("Thanks for playing!\n");
                 System.out.println(session);
+
                 playing = false;
             }
         } while(playing);
