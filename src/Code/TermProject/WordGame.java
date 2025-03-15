@@ -1,5 +1,6 @@
 package TermProject;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.Scanner;
@@ -21,22 +22,20 @@ public class WordGame
     private static final int THIRD_ANS              = 2;
     private static final int ANS_INDEX_SHIFT        = 1;
 
-    private static final World COUNTRIES = new World();
+    private static final World COUNTRIES      = new World();
     private static final Scanner INPUTSCANNER = new Scanner(System.in);
 
     private int gamesPlayed;
     private int firstTryAns;
     private int secondTryAns;
     private int incorrectAns;
-    private int score;
 
     private WordGame()
     {
-        this.score = INITIAL_STAT;
         this.incorrectAns = INITIAL_STAT;
         this.secondTryAns = INITIAL_STAT;
-        this.firstTryAns = INITIAL_STAT;
-        this.gamesPlayed = INITIAL_STAT;
+        this.firstTryAns  = INITIAL_STAT;
+        this.gamesPlayed  = INITIAL_STAT;
     }
 
     public static void wordGameMenu()
@@ -71,8 +70,7 @@ public class WordGame
             playGame = new StringBuilder();
 
             playGame.append("Would you like to play word game");
-            playGame.append((session.gamesPlayed == INITIAL_STAT) ? "?" : " again?\n"
-                    + session);
+            playGame.append((session.gamesPlayed == INITIAL_STAT) ? "?" : " again?");
 
             System.out.println(playGame);
 
@@ -92,9 +90,16 @@ public class WordGame
                                         session.firstTryAns,
                                         session.secondTryAns,
                                         session.incorrectAns);
+                try
+                {
+                    Score.appendScoreToFile(sessionResults, "test.txt");
+                } catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
 
                 System.out.println("Thanks for playing!\n");
-                System.out.println(session);
+                System.out.println(sessionResults);
 
                 playing = false;
             }
@@ -158,14 +163,12 @@ public class WordGame
                 {
                     System.out.println("Correct on the first try!");
                     this.firstTryAns++;
-                    this.score += FIRST_TRY_PTS;
                     guesses = TOTAL_ATTEMPTS;
                 }
                 case SECOND_ANS ->
                 {
                     System.out.println("Correct on the second try!");
                     this.secondTryAns++;
-                    this.score += FIRST_TRY_PTS;
                     guesses = TOTAL_ATTEMPTS;
                 }
                 default -> throw new IllegalStateException("Invalid guesses for correct gameplay");
@@ -362,29 +365,5 @@ public class WordGame
                     selectedCountries[correctIndex].getName());
 
         } while(guesses < TOTAL_ATTEMPTS);
-    }
-
-    @Override
-    public String toString()
-    {
-        StringBuilder stats;
-        stats = new StringBuilder();
-
-        stats.append("\nCurrent score: ");
-        stats.append(this.score);
-
-        stats.append(" points\nWord Games Played ");
-        stats.append(this.gamesPlayed);
-
-        stats.append("\nFirst attempt answers: ");
-        stats.append(this.firstTryAns);
-
-        stats.append("\nSecond attempt answers: ");
-        stats.append(this.secondTryAns);
-
-        stats.append("\nIncorrect answers: ");
-        stats.append(this.incorrectAns);
-
-        return stats.toString();
     }
 }

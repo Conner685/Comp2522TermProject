@@ -1,0 +1,7 @@
+Date and Time: 2025-03-10 21:04:28
+Games Played: 2
+Correct First Attempts: 5
+Correct Second Attempts: 0
+Incorrect Attempts: 15
+Score: 10 points
+

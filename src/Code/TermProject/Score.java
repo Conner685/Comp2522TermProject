@@ -11,8 +11,8 @@ public class Score
 {
 
     // Constants for score calculation
-    private static final int POINTS_FOR_FIRST_ATTEMPT   = 2;
-    private static final int POINTS_FOR_SECOND_ATTEMPT  = 1;
+    private static final int POINTS_FOR_FIRST_ATTEMPT       = 2;
+    private static final int POINTS_FOR_SECOND_ATTEMPT      = 1;
 
     private static final String DATE_TIME_PREFIX            = "Date and Time: ";
     private static final String GAMES_PLAYED_PREFIX         = "Games Played: ";
@@ -92,13 +92,30 @@ public class Score
     }
 
     // Append a score to the file
-    public static void appendScoreToFile(Score score, String fileName) throws IOException
+    public static void appendScoreToFile(Score score,
+                                         String fileName) throws IOException
     {
-        try (FileWriter fw = new FileWriter(fileName, true);
-             BufferedWriter bw = new BufferedWriter(fw);
-             PrintWriter out = new PrintWriter(bw)) {
+        try (FileWriter fileWriter = new FileWriter(fileName, true);
+
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+             PrintWriter out = new PrintWriter(bufferedWriter))
+        {
             out.println(score.toString());
         }
+    }
+
+    private static int readAndParseInt(final BufferedReader reader,
+                                       final String prefix) throws IOException
+    {
+        final String currLine;
+        final int parsedInt;
+        final String parsedString;
+
+        currLine = reader.readLine();
+        parsedString = currLine.substring(prefix.length());
+        parsedInt = Integer.parseInt(parsedString);
+        return parsedInt;
     }
 
     public static List<Score> readScoresFromFile(String fileName) throws IOException {
@@ -118,38 +135,26 @@ public class Score
                     );
 
                     // Parse the remaining fields
-                    int gamesPlayed;
-                    int correctFirstAttempts;
-                    int correctSecondAttempts;
-                    int incorrectAttempts;
+                    final int gamesPlayed;
+                    final int correctFirstAttempts;
+                    final int correctSecondAttempts;
+                    final int incorrectAttempts;
 
-                    gamesPlayed = Integer.parseInt(reader.readLine().substring(GAMES_PLAYED_PREFIX.length()));
-                    correctFirstAttempts = Integer.parseInt(reader.readLine().substring(FIRST_ATTEMPTS_PREFIX.length()));
-                    correctSecondAttempts = Integer.parseInt(reader.readLine().substring(SECOND_ATTEMPTS_PREFIX.length()));
-                    incorrectAttempts = Integer.parseInt(reader.readLine().substring(INCORRECT_ATTEMPTS_PREFIX.length()));
+                    gamesPlayed = readAndParseInt(reader, GAMES_PLAYED_PREFIX);
 
-                    // Read the score line and parse it
-                    String scoreLine = reader.readLine();
 
-                    if (scoreLine != null &&
-                            scoreLine.startsWith(SCORE_PREFIX))
-                    {
-                        int score = Integer.parseInt(
-                                scoreLine.substring(SCORE_PREFIX.length(),
-                                                    scoreLine.indexOf(SCORE_SUFFIX))
-                        );
+                    correctFirstAttempts = readAndParseInt(reader, FIRST_ATTEMPTS_PREFIX);
 
-                        // Create a new Score object and add it to the list
-                        scores.add(new Score(dateTime,
-                                            gamesPlayed,
-                                            correctFirstAttempts,
-                                            correctSecondAttempts,
-                                            incorrectAttempts));
-                    } else
-                    {
-                        // Handle malformed score line (e.g., log an error or skip this entry)
-                        System.err.println("Malformed score line in file: " + fileName);
-                    }
+                    correctSecondAttempts = readAndParseInt(reader, SECOND_ATTEMPTS_PREFIX);
+
+                    incorrectAttempts = readAndParseInt(reader, INCORRECT_ATTEMPTS_PREFIX);
+
+                    // Create a new Score object and add it to the list
+                    scores.add(new Score(dateTime,
+                            gamesPlayed,
+                            correctFirstAttempts,
+                            correctSecondAttempts,
+                            incorrectAttempts));
                 }
             }
         }
