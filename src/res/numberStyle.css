@@ -1,0 +1,25 @@
+#title
+{
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+}
+
+.label
+{
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+}
+
+.button
+{
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-background-color:  linear-gradient(rgba(107,134,139,1) 0%, rgba(133,176,188,1) 100%);
+    -fx-border-color: BLACK;
+    -fx-border-width: 3;
+}
+
+.root
+{
+    -fx-background-color: linear-gradient(rgba(133,176,188,1) 0%, rgba(107,134,139,1) 100%);;
+}

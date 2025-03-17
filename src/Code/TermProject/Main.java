@@ -1,40 +1,59 @@
 package TermProject;
 
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.stage.Stage;
+
 import java.util.Scanner;
 
-
-public class Main
+public class Main extends Application
 {
     public static void main(final String[] args)
     {
-        Scanner input;
-        String choice;
+        // Launch the JavaFX application to initialize the runtime
+        launch(args);
+    }
 
-        input = new Scanner(System.in);
+    @Override
+    public void start(Stage primaryStage)
+    {
+        Platform.setImplicitExit(false);
 
-        do
-        {
-            System.out.println("Press W to play the Word game.");
-            System.out.println("Press N to play the Number game.");
-            System.out.println("Press M to play the <your game's name> game.");
-            System.out.println("Press Q to quit.");
+        new Thread(() -> {
+            final Scanner input;
+            input = new Scanner(System.in);
+            String choice;
 
-            choice = input.nextLine();
-
-            switch (choice.toLowerCase())
+            do
             {
-                case "w" ->
+                System.out.println("Press W to play the Word game.");
+                System.out.println("Press N to play the Number game.");
+                System.out.println("Press M to play the <your game's name> game.");
+                System.out.println("Press Q to quit.");
+
+                choice = input.nextLine();
+
+                switch (choice.toLowerCase())
                 {
-                    WordGame.wordGameMenu();
+                    case "w" ->
+                    {
+                        WordGame.wordGameMenu();
+                    }
+                    case "n" ->
+                    {
+                        Platform.runLater(() -> new NumberGame().start(new Stage()));
+                    }
+                    case "m" -> System.out.println("Working3");
+                    case "q" -> {
+                        System.out.println("Exiting...");
+                        Platform.exit();
+                    }
+                    default -> System.out.println("Invalid input! Please try again!");
                 }
-                case "n" -> System.out.println("Working2");
-                case "m" -> System.out.println("Working3");
-                case "q" -> System.out.println("Exiting...");
-                default -> System.out.println("Invalid input! Please try again!");
-            }
 
-        } while (!choice.equalsIgnoreCase("q"));
+            } while (!choice.equalsIgnoreCase("q"));
 
-        input.close();
+            input.close();
+        }).start();
     }
 }
