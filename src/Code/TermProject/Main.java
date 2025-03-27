@@ -10,7 +10,6 @@ public class Main extends Application
 {
     public static void main(final String[] args)
     {
-        // Launch the JavaFX application to initialize the runtime
         launch(args);
     }
 
@@ -19,7 +18,8 @@ public class Main extends Application
     {
         Platform.setImplicitExit(false);
 
-        new Thread(() -> {
+        new Thread(() ->
+        {
             final Scanner input;
             input = new Scanner(System.in);
             String choice;
@@ -28,7 +28,7 @@ public class Main extends Application
             {
                 System.out.println("Press W to play the Word game.");
                 System.out.println("Press N to play the Number game.");
-                System.out.println("Press M to play the <your game's name> game.");
+                System.out.println("Press V to play Vortex.");
                 System.out.println("Press Q to quit.");
 
                 choice = input.nextLine();
@@ -43,8 +43,13 @@ public class Main extends Application
                     {
                         Platform.runLater(() -> new NumberGame().start(new Stage()));
                     }
-                    case "m" -> System.out.println("Working3");
-                    case "q" -> {
+                    case "v" ->
+                    {
+                        Platform.runLater(() -> new VortexGameEngine().start(new Stage()));
+                    }
+
+                    case "q" ->
+                    {
                         System.out.println("Exiting...");
                         Platform.exit();
                     }

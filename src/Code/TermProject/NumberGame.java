@@ -16,7 +16,7 @@ import java.util.Random;
  * The NumberGame class implements a simple number placement game using JavaFX.
  * The player must place randomly generated numbers in ascending order on a 4x5 grid.
  */
-public class NumberGame extends Application
+public class NumberGame extends Application implements GeneralGameLogic
 {
 
     private static final int ROWS = 4;
@@ -42,7 +42,7 @@ public class NumberGame extends Application
     private int gamesPlayed;
     private int gamesWon;
 
-    private Button[][] gridButtons;
+    private final Button[][] gridButtons;
     private Label statusLabel;
     private Label currentNumberLabel;
 
@@ -57,16 +57,6 @@ public class NumberGame extends Application
         gamesPlayed = INITIAL_STAT;
         gamesWon = INITIAL_STAT;
         gridButtons = new Button[ROWS][COLS];
-    }
-
-    /**
-     * The main method to launch the JavaFX application.
-     *
-     * @param args Command-line arguments (not used).
-     */
-    public static void main(final String[] args)
-    {
-        launch(args);
     }
 
     @Override
@@ -137,6 +127,7 @@ public class NumberGame extends Application
     {
         final Button button;
         button = new Button();
+
         button.setMinSize(BUTTON_SIZE, BUTTON_SIZE);
         button.setDisable(true);
         button.setOnAction(e -> handleButtonClick(row, col));
@@ -173,7 +164,8 @@ public class NumberGame extends Application
     /**
      * Starts a new game by resetting the game state and generating new random numbers.
      */
-    private void startNewGame()
+    @Override
+    public void startNewGame()
     {
         resetGameState();
         enableGridButtons();
@@ -234,7 +226,8 @@ public class NumberGame extends Application
      * @param row The row of the clicked button.
      * @param col The column of the clicked button.
      */
-    private void handleButtonClick(final int row, final int col)
+    private void handleButtonClick(final int row,
+                                   final int col)
     {
         if (currentNumberIndex >= TOTAL_SQUARES)
         {
@@ -307,7 +300,8 @@ public class NumberGame extends Application
      *
      * @param won Whether the player won the game.
      */
-    private void endGame(final boolean won)
+    @Override
+    public void endGame(final boolean won)
     {
         disableGridButtons();
         showGameResult(won);
@@ -336,7 +330,8 @@ public class NumberGame extends Application
      *
      * @param won Whether the player won the game.
      */
-    private void showGameResult(final boolean won)
+    @Override
+    public void showGameResult(final boolean won)
     {
         final String resultMessage;
         resultMessage = won ? "Congratulations! You won the game." : "Game over! You lost.";
@@ -348,47 +343,81 @@ public class NumberGame extends Application
                 (double) successfulPlacements / gamesPlayed
         );
 
-        showAlert(resultMessage + "\n\n" + scoreMessage);
+        final GameResultPopup popup;
+        popup = new GameResultPopup(resultMessage + "\n\n" + scoreMessage, this);
+        popup.show();
     }
 
     /**
-     * Displays an alert window with the given message.
-     *
-     * @param message The message to display in the alert window.
+     * Abstract class for popups.
      */
-    private void showAlert(final String message)
+    private abstract static class AlertPopup
     {
-        final Stage alertStage;
-        alertStage = new Stage();
+        protected final Stage alertStage;
+        protected final VBox alertBox;
 
-        final VBox alertBox;
-        alertBox = new VBox(PADDING, new Label(message));
-
-        final Button playAgainButton;
-        playAgainButton = new Button("Play Again");
-        playAgainButton.setOnAction(e ->
+        /**
+         * Constructor for AlertPopup.
+         *
+         * @param message The message to display in the popup.
+         */
+        public AlertPopup(final String message)
         {
-            alertStage.close();
-            startNewGame();
-        });
+            alertStage = new Stage();
+            alertBox = new VBox(PADDING, new Label(message));
+            alertBox.setAlignment(Pos.CENTER);
+            alertBox.setPadding(new Insets(ROOT_PADDING));
+        }
 
-        final Button quitButton;
-        quitButton = new Button("Quit");
-        quitButton.setOnAction(e ->
+        /**
+         * Displays the popup.
+         */
+        public void show()
         {
-            alertStage.close();
-            ((Stage) gridButtons[0][0].getScene().getWindow()).close();
-        });
+            final Scene alertScene;
+            alertScene = new Scene(alertBox, ALERT_WIDTH, ALERT_HEIGHT);
+            alertScene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
 
-        alertBox.getChildren().addAll(playAgainButton, quitButton);
-        alertBox.setAlignment(Pos.CENTER);
-        alertBox.setPadding(new Insets(ROOT_PADDING));
+            alertStage.setScene(alertScene);
+            alertStage.show();
+        }
+    }
 
-        final Scene alertScene;
-        alertScene = new Scene(alertBox, ALERT_WIDTH, ALERT_HEIGHT);
-        alertScene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
+    /**
+     * Concrete class for game result popups.
+     */
+    private static class GameResultPopup extends AlertPopup
+    {
+        private final NumberGame game;
 
-        alertStage.setScene(alertScene);
-        alertStage.show();
+        /**
+         * Constructor for GameResultPopup.
+         *
+         * @param message The message to display in the popup.
+         * @param game    The NumberGame instance.
+         */
+        public GameResultPopup(final String message, final NumberGame game)
+        {
+            super(message);
+            this.game = game;
+
+            final Button playAgainButton;
+            playAgainButton = new Button("Play Again");
+            playAgainButton.setOnAction(e ->
+            {
+                alertStage.close();
+                game.startNewGame();
+            });
+
+            final Button quitButton;
+            quitButton = new Button("Quit");
+            quitButton.setOnAction(e ->
+            {
+                alertStage.close();
+                ((Stage) game.gridButtons[0][0].getScene().getWindow()).close();
+            });
+
+            alertBox.getChildren().addAll(playAgainButton, quitButton);
+        }
     }
 }

@@ -1,0 +1,63 @@
+/* Root pane styling */
+.root
+{
+    -fx-background-color: #1e1e2e; /* Dark background */
+}
+
+/* Player styling */
+.player
+{
+    -fx-fill: #89b4fa; /* Light blue */
+    -fx-stroke: #1e1e2e; /* Dark outline */
+    -fx-stroke-width: 2;
+}
+
+/* Projectile styling */
+.projectile
+{
+    -fx-fill: #f38ba8; /* Light red */
+    -fx-stroke: #1e1e2e; /* Dark outline */
+    -fx-stroke-width: 2;
+}
+
+/*Star styling*/
+.star
+{
+    -fx-fill: yellow;
+    -fx-stroke: orange;
+    -fx-stroke-width: 2;
+}
+
+/* Start menu text styling */
+.start-text
+{
+    -fx-fill: #cdd6f4; /* Light gray */
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Game over text styling */
+.game-over-text
+{
+    -fx-fill: #f38ba8; /* Light red */
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Survival time text styling */
+.survival-time-text
+{
+    -fx-fill: #a6e3a1; /* Light green */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+#boostCut
+{
+    -fx-accent: RED;
+}
+
+.progress-bar
+{
+    -fx-accent: blue;
+}
