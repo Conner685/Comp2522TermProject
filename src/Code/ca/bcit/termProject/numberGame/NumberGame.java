@@ -85,6 +85,8 @@ public class NumberGame extends Application implements GeneralGameLogic
 
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.toFront();
+        primaryStage.requestFocus();
     }
 
     /**

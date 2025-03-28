@@ -1,6 +1,7 @@
-package ca.bcit.termProject.vortexGame;
+package ca.bcit.termProject;
 
 import ca.bcit.termProject.numberGame.NumberGame;
+import ca.bcit.termProject.vortexGame.VortexGameEngine;
 import ca.bcit.termProject.wordGame.WordGame;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -9,8 +10,6 @@ import javafx.stage.Stage;
 import java.util.Scanner;
 
 public class Main extends Application
-
-    //TODO MAKE DIFFERNET PACKAGES FOR EACH GAMES AND SET VISIBILITY AS NEEDED
 {
     public static void main(final String[] args)
     {
@@ -48,7 +47,9 @@ public class Main extends Application
                     case "n" ->
                     {
                         Platform.runLater(() -> new NumberGame().start(new Stage()));
+
                     }
+
                     case "v" ->
                     {
                         Platform.runLater(() -> new VortexGameEngine().start(new Stage()));

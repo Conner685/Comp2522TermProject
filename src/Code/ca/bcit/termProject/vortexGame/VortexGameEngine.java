@@ -25,8 +25,8 @@ public class VortexGameEngine extends Application
     //Window
     protected static final int SCREEN_WIDTH = 1000;
     protected static final int SCREEN_HEIGHT = 750;
-    private static final double HALF_SCREEN_WIDTH = (double) SCREEN_WIDTH / 2;
-    private static final double HALF_SCREEN_HEIGHT = (double) SCREEN_HEIGHT / 2;
+    protected static final double HALF_SCREEN_WIDTH = (double) SCREEN_WIDTH / 2;
+    protected static final double HALF_SCREEN_HEIGHT = (double) SCREEN_HEIGHT / 2;
 
     //Program Logic
     private static final int INITIAL_STAT = 0;
@@ -38,8 +38,6 @@ public class VortexGameEngine extends Application
     //TODO Design full main menu and game over screen,
     private static final int START_TEXT_OFFSET_X = 70;
     private static final int START_TEXT_OFFSET_Y = 0;
-    private static final int GAME_OVER_TEXT_OFFSET_X = 100;
-    private static final int GAME_OVER_TEXT_OFFSET_Y = 30;
     private static final int SURVIVAL_TIME_TEXT_OFFSET_X = 10;
     private static final int SURVIVAL_TIME_TEXT_OFFSET_Y = 20;
     private static final int BOOST_BAR_OFFSET_X = 140;
@@ -85,7 +83,6 @@ public class VortexGameEngine extends Application
     private GameState currentState = GameState.MENU;
 
     private Text startText;
-    private Text gameOverText;
     private Text survivalTimeText;
     private AnimationTimer gameLoop;
     private ProgressBar boostBar;
@@ -101,26 +98,51 @@ public class VortexGameEngine extends Application
         final Scene scene;
         vortexGameEngine = new VortexGameEngine();
 
-        scene = new Scene(vortexGameEngine.createContent(), SCREEN_WIDTH, SCREEN_HEIGHT);
+        scene = new Scene(vortexGameEngine.initilizeContent(), SCREEN_WIDTH, SCREEN_HEIGHT);
 
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/VortexDesign.css")).toExternalForm());
 
         primaryStage.setTitle("Vortex - Bullet Hell");
         primaryStage.setScene(scene);
+        vortexGameEngine.showMainMenu();
         primaryStage.show();
-
-        vortexGameEngine.getRoot().requestFocus();
+        primaryStage.toFront();
+        primaryStage.requestFocus();
     }
 
     /**
-     * Creates and configures the main game content pane.
-     * @return The configured Pane containing all game elements
+     * Shows the main menu screen.
      */
-    public Pane createContent() //TODO Make this a separate class(?)
+    public void showMainMenu()
+    {
+        currentState = GameState.MENU;
+        root.getChildren().clear();
+        root.getChildren().add(new MainMenu(this));
+    }
+
+    /**
+     * Shows the main menu screen.
+     */
+    public void showGameOverScreen(final int survivalTime)
+    {
+        currentState = GameState.GAME_OVER;
+        root.getChildren().clear();
+        root.getChildren().add(new GameOverScreen(this, survivalTime));
+    }
+
+    private Pane initilizeContent()
     {
         root = new Pane();
         root.setPrefSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         root.setFocusTraversable(true);
+        return root;
+    }
+
+    /**
+     * Creates and configures the main game content pane.
+     */
+    public void createContent() //TODO Make this a separate class(?)
+    {
         STAR_BLUR.setWidth(STAR_BLUR_INTENSITY);
         STAR_BLUR.setHeight(STAR_BLUR_INTENSITY);
         spawnStars();
@@ -135,13 +157,6 @@ public class VortexGameEngine extends Application
         startText.setX(HALF_SCREEN_WIDTH - START_TEXT_OFFSET_X);
         startText.setY(HALF_SCREEN_HEIGHT + START_TEXT_OFFSET_Y);
         root.getChildren().add(startText);
-
-        gameOverText = new Text();
-        gameOverText.getStyleClass().add("game-over-text");
-        gameOverText.setVisible(false);
-        gameOverText.setX(HALF_SCREEN_WIDTH - GAME_OVER_TEXT_OFFSET_X);
-        gameOverText.setY(HALF_SCREEN_HEIGHT + GAME_OVER_TEXT_OFFSET_Y);
-        root.getChildren().add(gameOverText);
 
         survivalTimeText = new Text("Time: 0s");
         survivalTimeText.getStyleClass().add("survival-time-text");
@@ -164,12 +179,6 @@ public class VortexGameEngine extends Application
             if (code == KeyCode.A) isAPressed = true;
             if (code == KeyCode.D) isDPressed = true;
             if (code == KeyCode.SHIFT) isShiftPressed = true;
-            if (code == KeyCode.ENTER &&
-                currentState != GameState.PLAYING)
-            {
-                if (currentState == GameState.MENU) startGame();
-                else if (currentState == GameState.GAME_OVER) restartGame();
-            }
         });
 
         root.setOnKeyReleased(e ->
@@ -181,9 +190,6 @@ public class VortexGameEngine extends Application
             if (code == KeyCode.D) isDPressed = false;
             if (code == KeyCode.SHIFT) isShiftPressed = false;
         });
-
-        root.requestFocus();
-        return root;
     }
 
     /**
@@ -191,9 +197,10 @@ public class VortexGameEngine extends Application
      */
     public void startGame()
     {
+        root.getChildren().clear();
+        this.createContent();
         currentState = GameState.PLAYING;
         startText.setVisible(false);
-        gameOverText.setVisible(false);
         startTime = System.currentTimeMillis();
         projectileSpawnRate = INITIAL_PROJECTILE_SPAWN_RATE;
         powerUpSpawnedThisSecond = false;
@@ -366,7 +373,12 @@ public class VortexGameEngine extends Application
     private void moveProjectiles()
     {
         List<Projectile> projectilesToRemove = new ArrayList<>();
-        root.getChildren().forEach(node ->
+
+        // Create a copy of the children list to avoid ConcurrentModificationException
+        final List<javafx.scene.Node> childrenCopy;
+        childrenCopy = new ArrayList<>(root.getChildren());
+
+        childrenCopy.forEach(node ->
         {
             if (node instanceof final Projectile projectile)
             {
@@ -388,7 +400,12 @@ public class VortexGameEngine extends Application
     {
         final List<GameObject> objectsToRemove;
         objectsToRemove = new ArrayList<>();
-        root.getChildren().forEach(node ->
+
+        // Create a copy of the children list to avoid ConcurrentModificationException
+        final List<javafx.scene.Node> childrenCopy;
+        childrenCopy = new ArrayList<>(root.getChildren());
+
+        childrenCopy.forEach(node ->
         {
             if (node instanceof final Projectile projectile)
             {
@@ -407,6 +424,7 @@ public class VortexGameEngine extends Application
                 }
             }
         });
+
         root.getChildren().removeAll(objectsToRemove);
     }
 
@@ -422,8 +440,7 @@ public class VortexGameEngine extends Application
         endTime = System.currentTimeMillis();
         survivalTime = (endTime - startTime) / MILLISECONDS_PER_SECOND;
 
-        gameOverText.setText("Game Over! Final Score: " + survivalTime + "s\nPress Enter to Restart");
-        gameOverText.setVisible(true);
+        this.showGameOverScreen((int) survivalTime);
         ScoreManager.saveScore(survivalTime);
         if (gameLoop != null)
         {
@@ -431,36 +448,6 @@ public class VortexGameEngine extends Application
         }
     }
 
-    /**
-     * Resets the game to its initial state for a new session.
-     */
-    private void restartGame()
-    {
-        // Reset game objects
-        root.getChildren().removeIf(node -> node instanceof Projectile);
-        root.getChildren().removeIf(node -> node instanceof Star);
-        root.getChildren().removeIf(node -> node instanceof PowerUp);
-        spawnStars();
-
-        // Reset player
-        player.setX(HALF_SCREEN_WIDTH - HALF_PLAYER_SIZE);
-        player.setY(HALF_SCREEN_HEIGHT - HALF_PLAYER_SIZE);
-        player.resetStats();
-
-        // Reset game state
-        gameOverText.setVisible(false);
-        projectileSpawnRate = INITIAL_PROJECTILE_SPAWN_RATE;
-        currentState = GameState.PLAYING;
-        startTime = System.currentTimeMillis();
-        powerUpSpawnedThisSecond = false;
-        root.requestFocus();
-        gameLoop.start();
-    }
-
-    /**
-     * Gets the root pane containing all game elements.
-     * @return The root Pane of the game scene
-     */
     public Pane getRoot()
     {
         return root;
