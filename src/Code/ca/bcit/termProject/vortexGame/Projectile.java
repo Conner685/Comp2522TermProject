@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
 import java.util.Random;
 
@@ -12,7 +12,7 @@ public class Projectile extends GameObject
     private static final int SIZE_SPEED_MODIFIER  = 5; // Modifier for speed based on projectile size
     private static final int CENTER_BOX_MAX       = 550; // Max bound for the center of the screen
     private static final int CENTER_BOX_MIN       = 200; // Min bound for the center of the screen
-    private static final int MAP_EDGE             = -100; // Edge of the screen
+    private static final int MAP_EDGE             = -100; // Edge of the screen with space for projectiles
     private static final int MIN_SIZE_AFFECT      = 10; // Minimum size to affect speed calculation
     private static final Random RAND = new Random();
     private static final int DIR_X = 0;
@@ -82,15 +82,23 @@ public class Projectile extends GameObject
      * @param y the y-coordinate of the projectile
      * @return an array containing the normalized direction vector [directionX, directionY]
      */
-    private double[] calculateDirection(final double x, final double y)
+    private double[] calculateDirection(final double x,
+                                        final double y) //TODO Improve so the java gods do not sob
     {
-        final double centerX = RAND.nextInt(CENTER_BOX_MAX) + CENTER_BOX_MIN; // Random center X
-        final double centerY = RAND.nextInt(CENTER_BOX_MAX) + CENTER_BOX_MIN; // Random center Y
+        final double centerX;
+        final double centerY;
 
-        final double deltaX = centerX - x;
-        final double deltaY = centerY - y;
+        final double deltaX;
+        final double deltaY;
+        final double magnitude;
 
-        final double magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        centerX = RAND.nextInt(CENTER_BOX_MAX) + CENTER_BOX_MIN; // Random center X
+        centerY = RAND.nextInt(CENTER_BOX_MAX) + CENTER_BOX_MIN; // Random center Y
+
+        deltaX = centerX - x;
+        deltaY= centerY - y;
+
+        magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         if (magnitude == MIN_MAG)
         {
             throw new IllegalStateException("Direction vector magnitude cannot be zero.");

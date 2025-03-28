@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.wordGame;
 
 
 import java.io.*;
@@ -9,6 +9,8 @@ import java.util.List;
 
 public class Score
 {
+
+    //TODO fix this absolute MESS, Use streaming if time allows
 
     // Constants for score calculation
     private static final int POINTS_FOR_FIRST_ATTEMPT       = 2;
@@ -92,8 +94,8 @@ public class Score
     }
 
     // Append a score to the file
-    public static void appendScoreToFile(Score score,
-                                         String fileName) throws IOException
+    public static void appendScoreToFile(final Score score,
+                                         final String fileName) throws IOException
     {
         try (FileWriter fileWriter = new FileWriter(fileName, true);
 
@@ -118,7 +120,7 @@ public class Score
         return parsedInt;
     }
 
-    public static List<Score> readScoresFromFile(String fileName) throws IOException {
+    public static List<Score> readScoresFromFile(final String fileName) throws IOException {
         List<Score> scores = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName)))

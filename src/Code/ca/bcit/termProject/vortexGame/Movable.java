@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
 /**
  * Represents an object that can move in the game.

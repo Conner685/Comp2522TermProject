@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.wordGame;
 
 public class Country
 {
@@ -35,7 +35,7 @@ public class Country
             throw new IllegalArgumentException("Invalid Array size");
         }
 
-        for (String fact : facts)
+        for (final String fact : facts)
         {
             validateString(fact);
         }

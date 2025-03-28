@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.numberGame;
 
 /**
  * The GameLogic interface defines the core game logic methods.

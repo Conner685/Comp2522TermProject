@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
 import java.util.Random;
 
@@ -11,8 +11,8 @@ public class Star extends GameObject
 
     public Star()
     {
-        super(RAND.nextInt(VortexGameEngine.getScreenWidth()),
-                RAND.nextInt(VortexGameEngine.getScreenHeight()),
+        super(RAND.nextInt(VortexGameEngine.SCREEN_WIDTH),
+                RAND.nextInt( VortexGameEngine.SCREEN_HEIGHT),
                 RAND.nextInt(MAX_SIZE - MIN_SIZE) + MIN_SIZE);
         getStyleClass().add("star");
         setRotate(ROTATION);

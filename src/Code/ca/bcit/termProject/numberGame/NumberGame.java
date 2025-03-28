@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.numberGame;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -18,7 +18,6 @@ import java.util.Random;
  */
 public class NumberGame extends Application implements GeneralGameLogic
 {
-
     private static final int ROWS = 4;
     private static final int COLS = 5;
     private static final int TOTAL_SQUARES = ROWS * COLS;
@@ -28,13 +27,12 @@ public class NumberGame extends Application implements GeneralGameLogic
     private static final int INITIAL_NUM = -1;
 
     private static final int BUTTON_SIZE = 100;
-    private static final int PADDING = 10;
-    private static final int ROOT_PADDING = 20;
-    private static final int ALERT_WIDTH = 650;
-    private static final int ALERT_HEIGHT = 300;
+    protected static final int PADDING = 10;
+    protected static final int ROOT_PADDING = 20;
+
     private static final int SCENE_WIDTH = 650;
     private static final int SCENE_HEIGHT = 750;
-    private static final String CSS_PATH = "/numberStyle.css";
+    protected static final String CSS_PATH = "/numberStyle.css";
 
     private final int[] numbers;
     private int currentNumberIndex;
@@ -43,20 +41,22 @@ public class NumberGame extends Application implements GeneralGameLogic
     private int gamesWon;
 
     private final Button[][] gridButtons;
-    private Label statusLabel;
-    private Label currentNumberLabel;
+    private final Label statusLabel;
+    private final Label currentNumberLabel;
 
     /**
      * Public constructor required by JavaFX.
      */
     public NumberGame()
     {
-        numbers = new int[TOTAL_SQUARES];
-        currentNumberIndex = INITIAL_STAT;
+        numbers              = new int[TOTAL_SQUARES];
+        currentNumberIndex   = INITIAL_STAT;
         successfulPlacements = INITIAL_STAT;
-        gamesPlayed = INITIAL_STAT;
-        gamesWon = INITIAL_STAT;
-        gridButtons = new Button[ROWS][COLS];
+        gamesPlayed          = INITIAL_STAT;
+        gamesWon             = INITIAL_STAT;
+        gridButtons          = new Button[ROWS][COLS];
+        statusLabel          = new Label();
+        currentNumberLabel   = new Label();
     }
 
     @Override
@@ -73,14 +73,13 @@ public class NumberGame extends Application implements GeneralGameLogic
     private void initializeUI(final Stage primaryStage)
     {
         primaryStage.setTitle("Number Game");
-
-        final GridPane grid;
-        grid = createGrid();
-
         final VBox root;
+        final GridPane grid;
+        final Scene scene;
+
+        grid = createGrid();
         root = createRootLayout(grid);
 
-        final Scene scene;
         scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT);
         scene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
 
@@ -123,7 +122,8 @@ public class NumberGame extends Application implements GeneralGameLogic
      * @param col The column of the button.
      * @return The initialized Button.
      */
-    private Button createGridButton(final int row, final int col)
+    private Button createGridButton(final int row,
+                                    final int col)
     {
         final Button button;
         button = new Button();
@@ -146,8 +146,7 @@ public class NumberGame extends Application implements GeneralGameLogic
         titleLabel = new Label("Number Placement Game");
         titleLabel.setId("title");
 
-        statusLabel = new Label("Click 'Start Game' to begin.");
-        currentNumberLabel = new Label();
+        statusLabel.setText("Click 'Start Game' to begin.");
 
         final Button startButton;
         startButton = new Button("Start Game");
@@ -178,8 +177,8 @@ public class NumberGame extends Application implements GeneralGameLogic
      */
     private void resetGameState()
     {
-        currentNumberIndex = 0;
-        successfulPlacements = 0;
+        currentNumberIndex = INITIAL_STAT;
+        successfulPlacements = INITIAL_STAT;
         gamesPlayed++;
     }
 
@@ -349,75 +348,19 @@ public class NumberGame extends Application implements GeneralGameLogic
     }
 
     /**
-     * Abstract class for popups.
+     * Gets specific grid button
+     * @return grid button
      */
-    private abstract static class AlertPopup
+    public Button getGridButtons(final int x,
+                                 final int y)
     {
-        protected final Stage alertStage;
-        protected final VBox alertBox;
-
-        /**
-         * Constructor for AlertPopup.
-         *
-         * @param message The message to display in the popup.
-         */
-        public AlertPopup(final String message)
+        if (x >= gridButtons.length ||
+                x < INITIAL_STAT ||
+                y >= gridButtons.length ||
+                y < INITIAL_STAT)
         {
-            alertStage = new Stage();
-            alertBox = new VBox(PADDING, new Label(message));
-            alertBox.setAlignment(Pos.CENTER);
-            alertBox.setPadding(new Insets(ROOT_PADDING));
+            throw new IllegalArgumentException("Attempting to get invalid grid button");
         }
-
-        /**
-         * Displays the popup.
-         */
-        public void show()
-        {
-            final Scene alertScene;
-            alertScene = new Scene(alertBox, ALERT_WIDTH, ALERT_HEIGHT);
-            alertScene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
-
-            alertStage.setScene(alertScene);
-            alertStage.show();
-        }
-    }
-
-    /**
-     * Concrete class for game result popups.
-     */
-    private static class GameResultPopup extends AlertPopup
-    {
-        private final NumberGame game;
-
-        /**
-         * Constructor for GameResultPopup.
-         *
-         * @param message The message to display in the popup.
-         * @param game    The NumberGame instance.
-         */
-        public GameResultPopup(final String message, final NumberGame game)
-        {
-            super(message);
-            this.game = game;
-
-            final Button playAgainButton;
-            playAgainButton = new Button("Play Again");
-            playAgainButton.setOnAction(e ->
-            {
-                alertStage.close();
-                game.startNewGame();
-            });
-
-            final Button quitButton;
-            quitButton = new Button("Quit");
-            quitButton.setOnAction(e ->
-            {
-                alertStage.close();
-                ((Stage) game.gridButtons[0][0].getScene().getWindow()).close();
-            });
-
-            alertBox.getChildren().addAll(playAgainButton, quitButton);
-        }
+        return gridButtons[x][y];
     }
 }

@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.wordGame;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
 import javafx.scene.shape.Rectangle;
 

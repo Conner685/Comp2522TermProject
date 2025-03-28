@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.wordGame;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

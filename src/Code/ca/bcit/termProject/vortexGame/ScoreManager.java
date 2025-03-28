@@ -1,4 +1,4 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,7 +33,7 @@ public class ScoreManager
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            e.printStackTrace(); //TODO Improve the error handling
         }
     }
 
@@ -60,6 +60,7 @@ public class ScoreManager
         {
             e.printStackTrace();
         }
+        //TODO Design proper leaderboard
         List<String> noScores;
         noScores = new ArrayList<>();
         noScores.add("No Scores!");

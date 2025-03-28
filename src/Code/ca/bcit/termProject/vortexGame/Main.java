@@ -1,5 +1,7 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
+import ca.bcit.termProject.numberGame.NumberGame;
+import ca.bcit.termProject.wordGame.WordGame;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -7,6 +9,8 @@ import javafx.stage.Stage;
 import java.util.Scanner;
 
 public class Main extends Application
+
+    //TODO MAKE DIFFERNET PACKAGES FOR EACH GAMES AND SET VISIBILITY AS NEEDED
 {
     public static void main(final String[] args)
     {
@@ -14,10 +18,11 @@ public class Main extends Application
     }
 
     @Override
-    public void start(Stage primaryStage)
+    public void start(final Stage primaryStage)
     {
         Platform.setImplicitExit(false);
 
+        //TODO Possible better solution(?) (ask brady he seems to know what he is doing)
         new Thread(() ->
         {
             final Scanner input;
@@ -26,6 +31,7 @@ public class Main extends Application
 
             do
             {
+                //TODO magic strings for W N V Q
                 System.out.println("Press W to play the Word game.");
                 System.out.println("Press N to play the Number game.");
                 System.out.println("Press V to play Vortex.");

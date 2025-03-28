@@ -1,9 +1,10 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.effect.BoxBlur;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -15,13 +16,15 @@ import java.util.Objects;
 import java.util.Random;
 
 /**
- * Manages the core game logic, including player movement, projectile spawning, and collisions.
+ * The main game engine class for the Vortex bullet hell game.
+ * Manages the game loop, player input, object spawning, collisions, and game state transitions.
+ * Extends JavaFX's Application class to provide the game window and rendering system.
  */
 public class VortexGameEngine extends Application
 {
     //Window
-    private static final int SCREEN_WIDTH = 1000;
-    private static final int SCREEN_HEIGHT = 750;
+    protected static final int SCREEN_WIDTH = 1000;
+    protected static final int SCREEN_HEIGHT = 750;
     private static final double HALF_SCREEN_WIDTH = (double) SCREEN_WIDTH / 2;
     private static final double HALF_SCREEN_HEIGHT = (double) SCREEN_HEIGHT / 2;
 
@@ -32,6 +35,7 @@ public class VortexGameEngine extends Application
     private static final int MILLISECONDS_PER_SECOND = 1000;
 
     //GUI
+    //TODO Design full main menu and game over screen,
     private static final int START_TEXT_OFFSET_X = 70;
     private static final int START_TEXT_OFFSET_Y = 0;
     private static final int GAME_OVER_TEXT_OFFSET_X = 100;
@@ -47,6 +51,8 @@ public class VortexGameEngine extends Application
     //Game Objects
     private static final int MIN_STARS = 10;
     private static final int MAX_STARS = 50;
+    private static final BoxBlur STAR_BLUR = new BoxBlur();
+    private static final int STAR_BLUR_INTENSITY = 5;
     private static final int POWER_UP_SPAWN_RATE = 5;
     private static final int POWER_UP_SIZE = 20;
     private static final int POWER_UP_INITIAL_DELAY = 5;
@@ -59,6 +65,7 @@ public class VortexGameEngine extends Application
     private static final int PROJECTILE_SPAWN_RATE_DECREMENT = 5;
     private static final int MIN_PROJECTILE_SPAWN_RATE = 10;
 
+    //TODO Fix this mess
     private Pane root;
     private Player player;
     private long startTime;
@@ -71,6 +78,9 @@ public class VortexGameEngine extends Application
     private boolean isDPressed = false;
     private boolean isShiftPressed = false;
 
+    /**
+     * Enum representing the possible states of the game.
+     */
     private enum GameState { MENU, PLAYING, GAME_OVER }
     private GameState currentState = GameState.MENU;
 
@@ -80,6 +90,10 @@ public class VortexGameEngine extends Application
     private AnimationTimer gameLoop;
     private ProgressBar boostBar;
 
+    /**
+     * The main entry point for the JavaFX application.
+     * @param primaryStage The primary stage for this application
+     */
     @Override
     public void start(final Stage primaryStage)
     {
@@ -98,11 +112,17 @@ public class VortexGameEngine extends Application
         vortexGameEngine.getRoot().requestFocus();
     }
 
-    public Pane createContent()
+    /**
+     * Creates and configures the main game content pane.
+     * @return The configured Pane containing all game elements
+     */
+    public Pane createContent() //TODO Make this a separate class(?)
     {
         root = new Pane();
         root.setPrefSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         root.setFocusTraversable(true);
+        STAR_BLUR.setWidth(STAR_BLUR_INTENSITY);
+        STAR_BLUR.setHeight(STAR_BLUR_INTENSITY);
         spawnStars();
 
         player = new Player(HALF_SCREEN_WIDTH - HALF_PLAYER_SIZE,
@@ -144,7 +164,8 @@ public class VortexGameEngine extends Application
             if (code == KeyCode.A) isAPressed = true;
             if (code == KeyCode.D) isDPressed = true;
             if (code == KeyCode.SHIFT) isShiftPressed = true;
-            if (code == KeyCode.ENTER && currentState != GameState.PLAYING)
+            if (code == KeyCode.ENTER &&
+                currentState != GameState.PLAYING)
             {
                 if (currentState == GameState.MENU) startGame();
                 else if (currentState == GameState.GAME_OVER) restartGame();
@@ -165,6 +186,9 @@ public class VortexGameEngine extends Application
         return root;
     }
 
+    /**
+     * Starts a new game session, initializing all game state.
+     */
     public void startGame()
     {
         currentState = GameState.PLAYING;
@@ -193,6 +217,9 @@ public class VortexGameEngine extends Application
         gameLoop.start();
     }
 
+    /**
+     * Main game update loop that handles all game logic each frame.
+     */
     private void update()
     {
         player.updateMovement(isWPressed, isSPressed, isAPressed, isDPressed, isShiftPressed);
@@ -218,6 +245,7 @@ public class VortexGameEngine extends Application
             boostBar.setId("");
         }
 
+        //TODO Scaling is fucked right now, fix it so people could conceivably get more then 50 seconds
         if (survivalTime % PROJECTILE_SPAWN_RATE_DECREMENT == INITIAL_STAT &&
                 projectileSpawnRate > MIN_PROJECTILE_SPAWN_RATE)
         {
@@ -230,6 +258,7 @@ public class VortexGameEngine extends Application
             if (!powerUpSpawnedThisSecond)
             {
                 spawnPowerUp();
+                System.out.println("Power up spawned at: " + survivalTime);
                 powerUpSpawnedThisSecond = true;
             }
         }
@@ -241,6 +270,9 @@ public class VortexGameEngine extends Application
 //        System.out.println(player.getSpeedModifier());
     }
 
+    /**
+     * Spawns new projectile enemies based on current spawn rate.
+     */
     private void spawnProjectiles()
     {
         final Random rand;
@@ -277,6 +309,9 @@ public class VortexGameEngine extends Application
         projectileSpawnCounter++;
     }
 
+    /**
+     * Creates background star elements for visual effect.
+     */
     private void spawnStars()
     {
         final Random rand;
@@ -287,10 +322,19 @@ public class VortexGameEngine extends Application
 
         for (int i = 0; i < totalStars; i++)
         {
-            root.getChildren().addFirst(new Star());
+            final Star star;
+
+            star = new Star();
+
+            star.setEffect(STAR_BLUR);
+
+            root.getChildren().addFirst(star);
         }
     }
 
+    /**
+     * Spawns a random power-up at a random position.
+     */
     private void spawnPowerUp()
     {
         final double x;
@@ -316,6 +360,9 @@ public class VortexGameEngine extends Application
         root.getChildren().add(powerUp);
     }
 
+    /**
+     * Updates positions of all projectiles and removes off-screen ones.
+     */
     private void moveProjectiles()
     {
         List<Projectile> projectilesToRemove = new ArrayList<>();
@@ -334,9 +381,13 @@ public class VortexGameEngine extends Application
         root.getChildren().removeAll(projectilesToRemove);
     }
 
+    /**
+     * Checks for collisions between player and other game objects.
+     */
     private void checkCollisions()
     {
-        final List<GameObject> objectsToRemove = new ArrayList<>();
+        final List<GameObject> objectsToRemove;
+        objectsToRemove = new ArrayList<>();
         root.getChildren().forEach(node ->
         {
             if (node instanceof final Projectile projectile)
@@ -359,6 +410,9 @@ public class VortexGameEngine extends Application
         root.getChildren().removeAll(objectsToRemove);
     }
 
+    /**
+     * Ends the current game session and shows game over screen.
+     */
     private void endGame()
     {
         currentState = GameState.GAME_OVER;
@@ -377,6 +431,9 @@ public class VortexGameEngine extends Application
         }
     }
 
+    /**
+     * Resets the game to its initial state for a new session.
+     */
     private void restartGame()
     {
         // Reset game objects
@@ -400,16 +457,10 @@ public class VortexGameEngine extends Application
         gameLoop.start();
     }
 
-    public static int getScreenWidth()
-    {
-        return SCREEN_WIDTH;
-    }
-
-    public static int getScreenHeight()
-    {
-        return SCREEN_HEIGHT;
-    }
-
+    /**
+     * Gets the root pane containing all game elements.
+     * @return The root Pane of the game scene
+     */
     public Pane getRoot()
     {
         return root;

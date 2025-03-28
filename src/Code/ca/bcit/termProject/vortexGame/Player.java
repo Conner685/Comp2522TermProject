@@ -1,5 +1,4 @@
-package TermProject;
-
+package ca.bcit.termProject.vortexGame;
 
 /**
  * Represents a player in the game that can move and use a boost mechanic.
@@ -43,10 +42,10 @@ public class Player extends GameObject
     /**
      * Updates the player's movement based on input and boost state.
      *
-     * @param isWPressed    whether the W key is pressed
-     * @param isSPressed    whether the S key is pressed
-     * @param isAPressed    whether the A key is pressed
-     * @param isDPressed    whether the D key is pressed
+     * @param isWPressed     whether the W key is pressed
+     * @param isSPressed     whether the S key is pressed
+     * @param isAPressed     whether the A key is pressed
+     * @param isDPressed     whether the D key is pressed
      * @param isShiftPressed whether the Shift key is pressed
      */
     public void updateMovement(final boolean isWPressed,
@@ -55,8 +54,11 @@ public class Player extends GameObject
                                final boolean isDPressed,
                                boolean isShiftPressed)
     {
-        double deltaX = DELTA_START;
-        double deltaY = DELTA_START;
+        double deltaX;
+        double deltaY;
+
+         deltaX = DELTA_START;
+         deltaY = DELTA_START;
 
         if (isShiftPressed && !boostCut)
         {
@@ -100,8 +102,8 @@ public class Player extends GameObject
         move(deltaX, deltaY);
 
         // Prevent moving out of screen bounds
-        setX(Math.max(DELTA_START, Math.min(getX(), VortexGameEngine.getScreenWidth() - getWidth())));
-        setY(Math.max(DELTA_START, Math.min(getY(), VortexGameEngine.getScreenHeight() - getHeight())));
+        setX(Math.max(DELTA_START, Math.min(getX(), VortexGameEngine.SCREEN_WIDTH - getWidth())));
+        setY(Math.max(DELTA_START, Math.min(getY(), VortexGameEngine.SCREEN_HEIGHT - getHeight())));
     }
 
     /**
@@ -159,6 +161,7 @@ public class Player extends GameObject
     public void IncrementSpeedMod(final double increment)
     {
         this.speedModifier += increment;
+        System.out.println("Current Speed Mod" + speedModifier);
     }
 
     /**
@@ -168,10 +171,6 @@ public class Player extends GameObject
     public void IncrementBoostMod(final int increment)
     {
         this.boostLimit += increment;
-    }
-
-    public double getSpeedModifier()
-    {
-        return speedModifier;
+        System.out.println("Current Boost limit" + boostLimit);
     }
 }

@@ -1,12 +1,17 @@
-package TermProject;
+package ca.bcit.termProject.vortexGame;
 
-import javafx.scene.paint.Color;
-
+/**
+ * Functions as a basic template for all power ups, providing an automated size, style affects, and details universal
+ * to power ups.
+ */
 public abstract class PowerUp extends GameObject
 {
     private static final int POWER_UP_SIZE = 20;
     private static final int POWER_UP_ANGLE = 45;
 
+    /**
+     * Each power up type used for random selection of children
+     */
     public enum PowerUpType
     {
         SPEED_BOOST,
@@ -14,23 +19,19 @@ public abstract class PowerUp extends GameObject
         REFRESH_BOOST
     }
 
+    /**
+     * Base power up template
+     * @param x position
+     * @param y position
+     * @param type specific power up
+     */
     public PowerUp(final double x,
                    final double y,
                    final PowerUpType type)
     {
         super(x, y, POWER_UP_SIZE);
         setRotate(POWER_UP_ANGLE);
-        setFill(getColorForType(type));
-    }
-
-    private Color getColorForType(final PowerUpType type)
-    {
-        return switch (type)
-        {
-            case SPEED_BOOST -> Color.GREEN;
-            case BOOST_UP -> Color.PURPLE;
-            case REFRESH_BOOST -> Color.BLUE;
-        };
+        getStyleClass().add("PowerUp");
     }
 
     /**
