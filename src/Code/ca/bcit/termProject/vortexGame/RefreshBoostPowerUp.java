@@ -22,6 +22,6 @@ public class RefreshBoostPowerUp extends PowerUp
     public void applyEffect(final Player player)
     {
         player.resetBoost();
-        System.out.println("Boost Refreshed");
+//        System.out.println("Boost Refreshed");
     }
 }

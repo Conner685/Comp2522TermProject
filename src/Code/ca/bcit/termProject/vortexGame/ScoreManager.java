@@ -8,6 +8,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Manages saving and retrieving high scores for the game.
@@ -47,21 +49,26 @@ public class ScoreManager
         try
         {
             final Path path;
-            path = Paths.get("res", "VortexScore.txt");
+            path = Paths.get("src", "res", "VortexScore.txt");
 
             if (Files.exists(path))
             {
                 final List<String> scores;
                 scores = Files.readAllLines(path);
-                return scores.stream().sorted(Comparator.reverseOrder()).limit(n).toList();
+                return scores.stream()
+                        .filter(Objects::nonNull)
+                        .filter(s -> !s.trim().isEmpty())
+                        .map(Integer::parseInt)
+                        .sorted(Comparator.reverseOrder())
+                        .limit(n)
+                        .map(Object::toString)
+                        .collect(Collectors.toList());
             }
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }
-        //TODO Design proper leaderboard
-        List<String> noScores;
+        final List<String> noScores;
         noScores = new ArrayList<>();
         noScores.add("No Scores!");
         return noScores;

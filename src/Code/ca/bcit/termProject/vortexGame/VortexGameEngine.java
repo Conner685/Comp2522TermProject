@@ -4,7 +4,6 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.effect.BoxBlur;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -14,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+
+import static ca.bcit.termProject.vortexGame.BoostUpPowerUp.BOOST_BAR_SIZE_INCREASE;
+import static ca.bcit.termProject.vortexGame.Player.INITIAL_BOOST_LIMIT;
+import static ca.bcit.termProject.vortexGame.PowerUp.spawnPowerUp;
+import static ca.bcit.termProject.vortexGame.Star.spawnStars;
 
 /**
  * The main game engine class for the Vortex bullet hell game.
@@ -35,7 +39,6 @@ public class VortexGameEngine extends Application
     private static final int MILLISECONDS_PER_SECOND = 1000;
 
     //GUI
-    //TODO Design full main menu and game over screen,
     private static final int START_TEXT_OFFSET_X = 70;
     private static final int START_TEXT_OFFSET_Y = 0;
     private static final int SURVIVAL_TIME_TEXT_OFFSET_X = 10;
@@ -47,23 +50,17 @@ public class VortexGameEngine extends Application
     private static final int INITIALIZE_BOOST = 1;
 
     //Game Objects
-    private static final int MIN_STARS = 10;
-    private static final int MAX_STARS = 50;
-    private static final BoxBlur STAR_BLUR = new BoxBlur();
-    private static final int STAR_BLUR_INTENSITY = 5;
     private static final int POWER_UP_SPAWN_RATE = 5;
-    private static final int POWER_UP_SIZE = 20;
     private static final int POWER_UP_INITIAL_DELAY = 5;
-    private static final PowerUp.PowerUpType[] POWER_UP_TYPES = PowerUp.PowerUpType.values();
     private static final int PLAYER_SIZE = 30;
     private static final double HALF_PLAYER_SIZE = (double) PLAYER_SIZE / 2;
-    private static final int INITIAL_PROJECTILE_SPAWN_RATE = 100;
     private static final int MIN_PROJECTILE_SIZE = 10;
     private static final int MAX_PROJECTILE_SIZE = 60;
-    private static final int PROJECTILE_SPAWN_RATE_DECREMENT = 5;
+    private static final int INITIAL_PROJECTILE_SPAWN_RATE = 50;
     private static final int MIN_PROJECTILE_SPAWN_RATE = 10;
+    private static final int TIME_TO_MAX_DIFFICULTY = 60;     // 1 minutes to reach max difficulty
+    private static final int PROJECTILE_SPAWN_UPDATE_INTERVAL = 5;
 
-    //TODO Fix this mess
     private Pane root;
     private Player player;
     private long startTime;
@@ -141,16 +138,15 @@ public class VortexGameEngine extends Application
     /**
      * Creates and configures the main game content pane.
      */
-    public void createContent() //TODO Make this a separate class(?)
+    public void createContent()
     {
-        STAR_BLUR.setWidth(STAR_BLUR_INTENSITY);
-        STAR_BLUR.setHeight(STAR_BLUR_INTENSITY);
-        spawnStars();
+        spawnStars(this);
 
         player = new Player(HALF_SCREEN_WIDTH - HALF_PLAYER_SIZE,
                 HALF_SCREEN_HEIGHT - HALF_PLAYER_SIZE,
                 PLAYER_SIZE);
         root.getChildren().add(player);
+//        System.out.println("Player init");
 
         startText = new Text("Press Enter to Start");
         startText.getStyleClass().add("start-text");
@@ -173,7 +169,9 @@ public class VortexGameEngine extends Application
 
         root.setOnKeyPressed(e ->
         {
+//            System.out.println(e);
             KeyCode code = e.getCode();
+//            System.out.println(code);
             if (code == KeyCode.W) isWPressed = true;
             if (code == KeyCode.S) isSPressed = true;
             if (code == KeyCode.A) isAPressed = true;
@@ -221,6 +219,7 @@ public class VortexGameEngine extends Application
                 }
             }
         };
+        root.requestFocus();
         gameLoop.start();
     }
 
@@ -247,16 +246,24 @@ public class VortexGameEngine extends Application
         {
             boostBar.setId("boostCut");
         }
+        else if (player.getBoost() > INITIAL_BOOST_LIMIT)
+        {
+            boostBar.setId("boostOverCharge");
+        }
         else
         {
             boostBar.setId("");
         }
 
-        //TODO Scaling is fucked right now, fix it so people could conceivably get more then 50 seconds
-        if (survivalTime % PROJECTILE_SPAWN_RATE_DECREMENT == INITIAL_STAT &&
-                projectileSpawnRate > MIN_PROJECTILE_SPAWN_RATE)
+        if (survivalTime % PROJECTILE_SPAWN_UPDATE_INTERVAL == INITIAL_STAT &&
+                survivalTime > INITIAL_STAT) // Skip the very first frame
         {
-            projectileSpawnRate--;
+            // Logarithmic difficulty scaling
+            double progress;
+            progress = Math.min(1.0, (double)survivalTime / TIME_TO_MAX_DIFFICULTY);
+            projectileSpawnRate = (int)(INITIAL_PROJECTILE_SPAWN_RATE -
+                    (INITIAL_PROJECTILE_SPAWN_RATE - MIN_PROJECTILE_SPAWN_RATE) *
+                            Math.log1p(progress * (Math.E - 1)));
         }
 
         if (survivalTime >= POWER_UP_INITIAL_DELAY &&
@@ -264,8 +271,8 @@ public class VortexGameEngine extends Application
         {
             if (!powerUpSpawnedThisSecond)
             {
-                spawnPowerUp();
-                System.out.println("Power up spawned at: " + survivalTime);
+                spawnPowerUp(this);
+//                System.out.println("Power up spawned at: " + survivalTime);
                 powerUpSpawnedThisSecond = true;
             }
         }
@@ -314,57 +321,6 @@ public class VortexGameEngine extends Application
             root.getChildren().add(projectile);
         }
         projectileSpawnCounter++;
-    }
-
-    /**
-     * Creates background star elements for visual effect.
-     */
-    private void spawnStars()
-    {
-        final Random rand;
-        final int totalStars;
-
-        rand = new Random();
-        totalStars = rand.nextInt(MAX_STARS - MIN_STARS) + MIN_STARS;
-
-        for (int i = 0; i < totalStars; i++)
-        {
-            final Star star;
-
-            star = new Star();
-
-            star.setEffect(STAR_BLUR);
-
-            root.getChildren().addFirst(star);
-        }
-    }
-
-    /**
-     * Spawns a random power-up at a random position.
-     */
-    private void spawnPowerUp()
-    {
-        final double x;
-        final double y;
-        final Random rand;
-        final PowerUp powerUp;
-        final PowerUp.PowerUpType type;
-
-        rand = new Random();
-
-        x = rand.nextInt(SCREEN_WIDTH - POWER_UP_SIZE);
-        y = rand.nextInt(SCREEN_HEIGHT - POWER_UP_SIZE);
-
-        type = POWER_UP_TYPES[rand.nextInt(POWER_UP_TYPES.length)];
-
-        powerUp = switch (type)
-        {
-            case SPEED_BOOST -> new SpeedBoostPowerUp(x, y);
-            case BOOST_UP -> new BoostUpPowerUp(x, y);
-            case REFRESH_BOOST -> new RefreshBoostPowerUp(x, y);
-        };
-
-        root.getChildren().add(powerUp);
     }
 
     /**

@@ -7,7 +7,7 @@ public class Player extends GameObject
 {
     private static final int SPEED = 5;
     private static final int BOOST_SPEED = 10;
-    private static final int INITIAL_BOOST_LIMIT = 200;
+    public static final int INITIAL_BOOST_LIMIT = 200;
     private static final int BOOST_DRAIN = 4;
     private static final int BOOST_REGEN = 1;
     private static final int BOOST_MIN = 0;
@@ -54,6 +54,7 @@ public class Player extends GameObject
                                final boolean isDPressed,
                                boolean isShiftPressed)
     {
+//        System.out.println("entered update movement");
         double deltaX;
         double deltaY;
 
@@ -141,7 +142,7 @@ public class Player extends GameObject
      */
     public int getMaxBoost()
     {
-        return INITIAL_BOOST_LIMIT;
+        return boostLimit;
     }
 
     /**
@@ -161,7 +162,7 @@ public class Player extends GameObject
     public void IncrementSpeedMod(final double increment)
     {
         this.speedModifier += increment;
-        System.out.println("Current Speed Mod" + speedModifier);
+//        System.out.println("Current Speed Mod" + speedModifier);
     }
 
     /**
@@ -171,6 +172,7 @@ public class Player extends GameObject
     public void IncrementBoostMod(final int increment)
     {
         this.boostLimit += increment;
-        System.out.println("Current Boost limit" + boostLimit);
+        this.currentBoost += increment;
+//        System.out.println("Current Boost limit" + boostLimit);
     }
 }

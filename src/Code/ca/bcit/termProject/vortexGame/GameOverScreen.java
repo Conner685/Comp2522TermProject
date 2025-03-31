@@ -1,21 +1,34 @@
 package ca.bcit.termProject.vortexGame;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
+import javafx.scene.paint.Color;
+
+import static ca.bcit.termProject.vortexGame.Star.spawnStars;
 
 /**
  * Represents the game over screen with options to retry or return to menu.
  */
 public class GameOverScreen extends Pane
 {
-    private static final int MENU_ITEM_SPACING = 20;
-    private static final int TITLE_OFFSET_Y = 100;
-    private static final int SCORE_OFFSET_Y = 150;
-    private static final int BUTTON_OFFSET_Y = 200;
-    private static final int BUTTON_WIDTH = 200;
-    private static final int BUTTON_HEIGHT = 50;
+    private static final int MENU_ITEM_SPACING = 25;
+    private static final int TITLE_OFFSET_Y = 120;
+    private static final int SCORE_OFFSET_Y = 180;
+    private static final int BUTTON_OFFSET_Y = 240;
+    private static final int BUTTON_WIDTH = 240;
+    private static final int BUTTON_HEIGHT = 60;
+    private static final int TITLE_X_OFFSET = 120;
+    private static final int HALF_BUTTON_WIDTH = BUTTON_WIDTH / 2;
+    private static final int BUTTON_SPACING = BUTTON_HEIGHT + MENU_ITEM_SPACING;
+    private static final double GLOW_LEVEL = 0.3;
+    private static final double SHADOW_RADIUS = 10.0;
+    private static final Color SHADOW_COLOR = Color.rgb(200, 0, 0, 0.9);
 
     private final VortexGameEngine gameEngine;
     private final long survivalTime;
@@ -34,47 +47,75 @@ public class GameOverScreen extends Pane
     }
 
     /**
-     * Creates and configures the game over content.
+     * Creates and configures the game over content with enhanced UI elements.
      */
     private void createContent()
     {
+        final DropShadow textShadow;
+        final Glow buttonGlow;
+
         final Text title;
         final Text scoreText;
         final Button retryButton;
         final Button menuButton;
         final Button quitButton;
 
-        title = new Text("Game Over");
+        retryButton = new Button("RETRY");
+        menuButton = new Button("MAIN MENU");
+        quitButton = new Button("QUIT");
+        scoreText = new Text("Survival Time: " + survivalTime + " seconds");
+        title = new Text("GAME OVER");
+        textShadow = new DropShadow(SHADOW_RADIUS, SHADOW_COLOR);
+        buttonGlow = new Glow(GLOW_LEVEL);
+
+        // Title styling
         title.getStyleClass().add("game-over-title");
-        title.setX(VortexGameEngine.HALF_SCREEN_WIDTH - 100);
+        title.setEffect(textShadow);
+        title.setX(VortexGameEngine.HALF_SCREEN_WIDTH - TITLE_X_OFFSET);
         title.setY(TITLE_OFFSET_Y);
 
-        scoreText = new Text("Survival Time: " + survivalTime + "s");
+        // Score styling
         scoreText.getStyleClass().add("game-over-score");
-        scoreText.setX(VortexGameEngine.HALF_SCREEN_WIDTH - 100);
+        scoreText.setEffect(textShadow);
+        scoreText.setX(VortexGameEngine.HALF_SCREEN_WIDTH - TITLE_X_OFFSET);
         scoreText.setY(SCORE_OFFSET_Y);
 
-        retryButton = new Button("Retry");
-        retryButton.getStyleClass().add("menu-button");
-        retryButton.setLayoutX(VortexGameEngine.HALF_SCREEN_WIDTH - BUTTON_WIDTH / 2);
-        retryButton.setLayoutY(BUTTON_OFFSET_Y);
-        retryButton.setPrefSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-        retryButton.setOnAction(e -> gameEngine.startGame());
+        // Button styling and effects
+        styleButton(retryButton, VortexGameEngine.HALF_SCREEN_WIDTH - HALF_BUTTON_WIDTH,
+                BUTTON_OFFSET_Y, buttonGlow, e -> gameEngine.startGame());
 
-        menuButton = new Button("Main Menu");
-        menuButton.getStyleClass().add("menu-button");
-        menuButton.setLayoutX(VortexGameEngine.HALF_SCREEN_WIDTH - BUTTON_WIDTH / 2);
-        menuButton.setLayoutY(BUTTON_OFFSET_Y + BUTTON_HEIGHT + MENU_ITEM_SPACING);
-        menuButton.setPrefSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-        menuButton.setOnAction(e -> gameEngine.showMainMenu());
+        styleButton(menuButton, VortexGameEngine.HALF_SCREEN_WIDTH - HALF_BUTTON_WIDTH,
+                BUTTON_OFFSET_Y + BUTTON_SPACING, buttonGlow, e -> gameEngine.showMainMenu());
 
-        quitButton = new Button("Quit");
-        quitButton.getStyleClass().add("menu-button");
-        quitButton.setLayoutX(VortexGameEngine.HALF_SCREEN_WIDTH - BUTTON_WIDTH / 2);
-        quitButton.setLayoutY(BUTTON_OFFSET_Y + 2 * (BUTTON_HEIGHT + MENU_ITEM_SPACING));
-        quitButton.setPrefSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-        quitButton.setOnAction(e -> ((Stage) gameEngine.getRoot().getScene().getWindow()).close());
+        styleButton(quitButton, VortexGameEngine.HALF_SCREEN_WIDTH - HALF_BUTTON_WIDTH,
+                BUTTON_OFFSET_Y + 2 * BUTTON_SPACING, buttonGlow,
+                e -> ((Stage) gameEngine.getRoot().getScene().getWindow()).close());
 
+        spawnStars(gameEngine);
         getChildren().addAll(title, scoreText, retryButton, menuButton, quitButton);
+    }
+
+    /**
+     * Styles a button with consistent appearance and hover effects.
+     * @param button The button to style
+     * @param x X position
+     * @param y Y position
+     * @param glow Glow effect
+     * @param action Event handler
+     */
+    private void styleButton(final Button button,
+                             final double x,
+                             final double y,
+                             final Glow glow,
+                             final EventHandler<ActionEvent> action)
+    {
+        button.getStyleClass().add("menu-button");
+        button.setLayoutX(x);
+        button.setLayoutY(y);
+        button.setPrefSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+        button.setOnAction(action);
+
+        button.setOnMouseEntered(e -> button.setEffect(glow));
+        button.setOnMouseExited(e -> button.setEffect(null));
     }
 }
