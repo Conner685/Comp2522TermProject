@@ -7,8 +7,8 @@ package ca.bcit.termProject.numberGame;
  */
 public interface GeneralGameLogic
 {
-    static final int PADDING = 10;
-    static final int ROOT_PADDING = 20;
+    int PADDING = 10;
+    int ROOT_PADDING = 20;
 
     void startNewGame();
     void endGame(final boolean won);
