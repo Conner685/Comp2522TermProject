@@ -5,9 +5,13 @@ import javafx.stage.Stage;
 
 /**
  * Concrete class for game result popups.
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class GameResultPopup extends BasePopup
+public final class GameResultPopup
+        extends BasePopup
 {
+    private static final int GRID_BASE = 0;
     /**
      * Constructor for GameResultPopup.
      *
@@ -18,21 +22,21 @@ public class GameResultPopup extends BasePopup
                            final NumberGame game)
     {
         super(message);
-
+        final Button quitButton;
         final Button playAgainButton;
+
+
         playAgainButton = new Button("Play Again");
         playAgainButton.setOnAction(e ->
         {
             alertStage.close();
             game.startNewGame();
         });
-
-        final Button quitButton;
         quitButton = new Button("Quit");
         quitButton.setOnAction(e ->
         {
             alertStage.close();
-            ((Stage) game.getGridButtons(0, 0).getScene().getWindow()).close();
+            ((Stage) game.getGridButtons(GRID_BASE, GRID_BASE).getScene().getWindow()).close();
         });
 
         alertBox.getChildren().addAll(playAgainButton, quitButton);

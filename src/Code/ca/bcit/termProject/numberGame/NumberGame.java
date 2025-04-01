@@ -10,13 +10,18 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
 import java.util.Random;
 
 /**
  * The NumberGame class implements a simple number placement game using JavaFX.
  * The player must place randomly generated numbers in ascending order on a 4x5 grid.
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class NumberGame extends Application implements GeneralGameLogic
+public final class NumberGame
+        extends Application
+        implements GeneralGameLogic
 {
     private static final int ROWS = 4;
     private static final int COLS = 5;
@@ -27,12 +32,10 @@ public class NumberGame extends Application implements GeneralGameLogic
     private static final int INITIAL_NUM = -1;
 
     private static final int BUTTON_SIZE = 100;
-    protected static final int PADDING = 10;
-    protected static final int ROOT_PADDING = 20;
 
     private static final int SCENE_WIDTH = 650;
     private static final int SCENE_HEIGHT = 750;
-    protected static final String CSS_PATH = "/numberStyle.css";
+    static final String CSS_PATH = "/numberStyle.css";
 
     private final int[] numbers;
     private int currentNumberIndex;
@@ -59,6 +62,10 @@ public class NumberGame extends Application implements GeneralGameLogic
         currentNumberLabel   = new Label();
     }
 
+    /**
+     * Overrides base start function from application.
+     * @param primaryStage main stage for the game
+     */
     @Override
     public void start(final Stage primaryStage)
     {
@@ -81,7 +88,7 @@ public class NumberGame extends Application implements GeneralGameLogic
         root = createRootLayout(grid);
 
         scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT);
-        scene.getStylesheets().add(getClass().getResource(CSS_PATH).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(CSS_PATH)).toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -145,16 +152,17 @@ public class NumberGame extends Application implements GeneralGameLogic
     private VBox createRootLayout(final GridPane grid)
     {
         final Label titleLabel;
+        final Button startButton;
+        final VBox root;
+
+        startButton = new Button("Start Game");
+        startButton.setOnAction(e -> startNewGame());
+
         titleLabel = new Label("Number Placement Game");
         titleLabel.setId("title");
 
         statusLabel.setText("Click 'Start Game' to begin.");
 
-        final Button startButton;
-        startButton = new Button("Start Game");
-        startButton.setOnAction(e -> startNewGame());
-
-        final VBox root;
         root = new VBox(ROOT_PADDING, titleLabel, statusLabel, currentNumberLabel, grid, startButton);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(ROOT_PADDING));
@@ -179,7 +187,7 @@ public class NumberGame extends Application implements GeneralGameLogic
      */
     private void resetGameState()
     {
-        currentNumberIndex = INITIAL_STAT;
+        currentNumberIndex   = INITIAL_STAT;
         successfulPlacements = INITIAL_STAT;
         gamesPlayed++;
     }
@@ -334,17 +342,17 @@ public class NumberGame extends Application implements GeneralGameLogic
     @Override
     public void showGameResult(final boolean won)
     {
+        final GameResultPopup popup;
+        final String scoreMessage;
         final String resultMessage;
         resultMessage = won ? "Congratulations! You won the game." : "Game over! You lost.";
 
-        final String scoreMessage;
         scoreMessage = String.format(
                 "Games Played: %d, Games Won: %d, Successful Placements: %d, Average: %.2f",
                 gamesPlayed, gamesWon, successfulPlacements,
                 (double) successfulPlacements / gamesPlayed
         );
 
-        final GameResultPopup popup;
         popup = new GameResultPopup(resultMessage + "\n\n" + scoreMessage, this);
         popup.show();
     }

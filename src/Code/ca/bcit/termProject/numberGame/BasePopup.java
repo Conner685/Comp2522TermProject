@@ -13,13 +13,16 @@ import static ca.bcit.termProject.numberGame.NumberGame.*;
 
 /**
  * Abstract base class for popups.
+ * @author Conner Ponton
+ * @version 1.0
  */
 public abstract class BasePopup
 {
-    protected final Stage alertStage;
-    protected final VBox alertBox;
     private static final int ALERT_WIDTH = 650;
     private static final int ALERT_HEIGHT = 300;
+
+    protected final Stage alertStage;
+    protected final VBox alertBox;
 
     /**
      * Constructor for BasePopup.
@@ -37,7 +40,7 @@ public abstract class BasePopup
     /**
      * Displays the popup.
      */
-    public void show()
+    public final void show()
     {
         final Scene alertScene;
         alertScene = new Scene(alertBox, ALERT_WIDTH, ALERT_HEIGHT);
