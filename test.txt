@@ -19,3 +19,10 @@ Correct Second Attempts: 0
 Incorrect Attempts: 4
 Score: 12 points
 
+Date and Time: 2025-04-03 09:18:30
+Games Played: 1
+Correct First Attempts: 8
+Correct Second Attempts: 1
+Incorrect Attempts: 1
+Score: 17 points
+

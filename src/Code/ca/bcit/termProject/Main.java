@@ -30,6 +30,11 @@ public class Main extends Application
         launch(args);
     }
 
+    /**
+     * Creates the main stage which games will launch from
+     *
+     * @param primaryStage for games
+     */
     @Override
     public void start(final Stage primaryStage)
     {
@@ -56,9 +61,10 @@ public class Main extends Application
                             WordGame.wordGameMenu();
                     case NUMBER_GAME ->
                             Platform.runLater(() ->
-                                new NumberGame().start(new Stage()));
+                                new NumberGame().start(primaryStage));
                     case VORTEX_GAME ->
-                            Platform.runLater(() -> new VortexGameEngine().start(new Stage()));
+                            Platform.runLater(() ->
+                                new VortexGameEngine().start(primaryStage));
                     case QUIT_GAME ->
                         {
                             System.out.println("Exiting...");

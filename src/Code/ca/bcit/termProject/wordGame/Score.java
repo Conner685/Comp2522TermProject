@@ -1,17 +1,22 @@
 package ca.bcit.termProject.wordGame;
 
-
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Score
+
+/**
+ * The Score class represents a player's score in the word game.
+ * It tracks game statistics, calculates the total score, and provides methods
+ * for reading and writing scores to files.
+ *
+ * @author Conner Ponton
+ * @version 1.0
+ */
+public final class Score
 {
-
-    //TODO fix this absolute MESS, Use streaming if time allows
-
     // Constants for score calculation
     private static final int POINTS_FOR_FIRST_ATTEMPT       = 2;
     private static final int POINTS_FOR_SECOND_ATTEMPT      = 1;
@@ -32,7 +37,16 @@ public class Score
     private final int incorrectAttempts;
     private final int score;
 
-    public Score(LocalDateTime dateTime,
+    /**
+     * Constructs a new Score object with the specified parameters.
+     *
+     * @param dateTime The date and time when the score was recorded
+     * @param gamesPlayed The total number of games played
+     * @param correctFirstAttempts The number of correct first attempts
+     * @param correctSecondAttempts The number of correct second attempts
+     * @param incorrectAttempts The number of incorrect attempts
+     */
+    public Score(final LocalDateTime dateTime,
                  final int gamesPlayed,
                  final int correctFirstAttempts,
                  final int correctSecondAttempts,
@@ -46,22 +60,131 @@ public class Score
         this.score = calculateScore();
     }
 
+    /**
+     * Calculates the total score based on correct attempts.
+     * First attempts are worth more points than second attempts.
+     *
+     * @return The calculated total score
+     */
     private int calculateScore()
     {
         return (correctFirstAttempts * POINTS_FOR_FIRST_ATTEMPT)
                 + (correctSecondAttempts * POINTS_FOR_SECOND_ATTEMPT);
     }
 
+    /**
+     * Gets the total calculated score.
+     *
+     * @return The total score
+     */
     public int getScore()
     {
         return score;
     }
 
-    // Format the score as a string
+    /**
+     * Appends a score record to the specified file.
+     *
+     * @param score The Score object to write to the file
+     * @param fileName The name of the file to append to
+     * @throws IOException If an I/O error occurs while writing to the file
+     */
+    public static void appendScoreToFile(final Score score,
+                                         final String fileName) throws IOException
+    {
+        try (FileWriter fileWriter = new FileWriter(fileName, true);
+
+             final BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+             final PrintWriter out = new PrintWriter(bufferedWriter))
+        {
+            out.println(score.toString());
+        }
+    }
+
+    /**
+     * Helper method to read and parse an integer value from a line in the score file.
+     *
+     * @param reader The BufferedReader to read from
+     * @param prefix The expected prefix of the line being read
+     * @return The parsed integer value
+     * @throws IOException If an I/O error occurs while reading
+     * @throws NumberFormatException If the value after the prefix is not a valid integer
+     */
+    private static int readAndParseInt(final BufferedReader reader,
+                                       final String prefix) throws IOException
+    {
+        final String currLine;
+        final int parsedInt;
+        final String parsedString;
+
+        currLine = reader.readLine();
+        parsedString = currLine.substring(prefix.length());
+        parsedInt = Integer.parseInt(parsedString);
+        return parsedInt;
+    }
+
+    /**
+     * Reads all scores from the specified file and returns them as a list.
+     *
+     * @param fileName The name of the file to read from
+     * @return A list of Score objects read from the file
+     * @throws IOException If an I/O error occurs while reading the file
+     */
+    public static List<Score> readScoresFromFile(final String fileName) throws IOException
+    {
+        final List<Score> scores;
+
+        scores = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName)))
+        {
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                if (line.startsWith(DATE_TIME_PREFIX))
+                {
+                    final LocalDateTime dateTime;
+                    final int gamesPlayed;
+                    final int correctFirstAttempts;
+                    final int correctSecondAttempts;
+                    final int incorrectAttempts;
+
+
+                    dateTime = LocalDateTime.parse(
+                                            line.substring(DATE_TIME_PREFIX.length()),
+                                            FORMATTER
+                    );
+
+                    gamesPlayed = readAndParseInt(reader, GAMES_PLAYED_PREFIX);
+
+                    correctFirstAttempts = readAndParseInt(reader, FIRST_ATTEMPTS_PREFIX);
+
+                    correctSecondAttempts = readAndParseInt(reader, SECOND_ATTEMPTS_PREFIX);
+
+                    incorrectAttempts = readAndParseInt(reader, INCORRECT_ATTEMPTS_PREFIX);
+
+                    scores.add(new Score(dateTime,
+                            gamesPlayed,
+                            correctFirstAttempts,
+                            correctSecondAttempts,
+                            incorrectAttempts));
+                }
+            }
+        }
+        return scores;
+    }
+
+    /**
+     * Formats the score as a string for file storage.
+     * The format includes all score components with appropriate prefixes.
+     *
+     * @return A string representation of the score
+     */
     @Override
     public String toString()
     {
-        StringBuilder result;
+        final StringBuilder result;
 
         result = new StringBuilder();
 
@@ -91,75 +214,5 @@ public class Score
         result.append("\n");
 
         return result.toString();
-    }
-
-    // Append a score to the file
-    public static void appendScoreToFile(final Score score,
-                                         final String fileName) throws IOException
-    {
-        try (FileWriter fileWriter = new FileWriter(fileName, true);
-
-             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-             PrintWriter out = new PrintWriter(bufferedWriter))
-        {
-            out.println(score.toString());
-        }
-    }
-
-    private static int readAndParseInt(final BufferedReader reader,
-                                       final String prefix) throws IOException
-    {
-        final String currLine;
-        final int parsedInt;
-        final String parsedString;
-
-        currLine = reader.readLine();
-        parsedString = currLine.substring(prefix.length());
-        parsedInt = Integer.parseInt(parsedString);
-        return parsedInt;
-    }
-
-    public static List<Score> readScoresFromFile(final String fileName) throws IOException {
-        List<Score> scores = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName)))
-        {
-            String line;
-            while ((line = reader.readLine()) != null)
-            {
-                if (line.startsWith(DATE_TIME_PREFIX))
-                {
-                    // Parse the date and time
-                    LocalDateTime dateTime = LocalDateTime.parse(
-                                            line.substring(DATE_TIME_PREFIX.length()),
-                                            FORMATTER
-                    );
-
-                    // Parse the remaining fields
-                    final int gamesPlayed;
-                    final int correctFirstAttempts;
-                    final int correctSecondAttempts;
-                    final int incorrectAttempts;
-
-                    gamesPlayed = readAndParseInt(reader, GAMES_PLAYED_PREFIX);
-
-
-                    correctFirstAttempts = readAndParseInt(reader, FIRST_ATTEMPTS_PREFIX);
-
-                    correctSecondAttempts = readAndParseInt(reader, SECOND_ATTEMPTS_PREFIX);
-
-                    incorrectAttempts = readAndParseInt(reader, INCORRECT_ATTEMPTS_PREFIX);
-
-                    // Create a new Score object and add it to the list
-                    scores.add(new Score(dateTime,
-                            gamesPlayed,
-                            correctFirstAttempts,
-                            correctSecondAttempts,
-                            incorrectAttempts));
-                }
-            }
-        }
-        return scores;
     }
 }

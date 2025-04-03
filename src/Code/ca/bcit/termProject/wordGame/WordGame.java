@@ -5,26 +5,35 @@ import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.Scanner;
 
-public class WordGame
+/**
+ * A geographical trivia game that tests knowledge of countries, capitals, and facts.
+ *
+ * @author Conner Ponton
+ * @version 1.0
+ */
+public final class WordGame
 {
-    private static final int INITIAL_STAT   = 0;
-
-    private static final int FIRST_TRY_PTS  = 2;
+    // Constants
+    private static final int INITIAL_STAT = 0;
+    private static final int FIRST_TRY_PTS = 2;
     private static final int SECOND_TRY_PTS = 1;
     private static final int TOTAL_ATTEMPTS = 2;
+    private static final int TOTAL_QUESTIONS = 10;
+    private static final int TOTAL_QUESTION_TYPES = 3;
+    private static final int TOTAL_ANSWERS = 3;
+    private static final int TOTAL_FACTS = 3;
+    private static final int FIRST_ANS = 0;
+    private static final int SECOND_ANS = 1;
+    private static final int THIRD_ANS = 2;
+    private static final int FIRST_Q = 0;
+    private static final int SECOND_Q = 1;
+    private static final int THIRD_Q = 2;
+    private static final int ANS_INDEX_SHIFT = 1;
 
-    private static final int TOTAL_QUESTIONS        = 10;
-    private static final int TOTAL_QUESTION_TYPES   = 3;
-    private static final int TOTAL_ANSWERS          = 3;
-    private static final int TOTAL_FACTS            = 3;
-    private static final int FIRST_ANS              = 0;
-    private static final int SECOND_ANS             = 1;
-    private static final int THIRD_ANS              = 2;
-    private static final int ANS_INDEX_SHIFT        = 1;
+    private static final World COUNTRIES = new World();
+    private static final Scanner INPUT_SCANNER = new Scanner(System.in);
 
-    private static final World COUNTRIES      = new World();
-    private static final Scanner INPUTSCANNER = new Scanner(System.in);
-
+    // Game statistics
     private int gamesPlayed;
     private int firstTryAns;
     private int secondTryAns;
@@ -32,117 +41,161 @@ public class WordGame
 
     private WordGame()
     {
-        this.incorrectAns = INITIAL_STAT;
-        this.secondTryAns = INITIAL_STAT;
-        this.firstTryAns  = INITIAL_STAT;
-        this.gamesPlayed  = INITIAL_STAT;
+        resetStats();
     }
 
+    /**
+     * Resets all game statistics to initial values.
+     */
+    private void resetStats()
+    {
+        this.incorrectAns = INITIAL_STAT;
+        this.secondTryAns = INITIAL_STAT;
+        this.firstTryAns = INITIAL_STAT;
+        this.gamesPlayed = INITIAL_STAT;
+    }
+
+    /**
+     * Displays the game menu and handles game sessions.
+     */
     public static void wordGameMenu()
     {
+        final WordGame session;
         boolean playing;
-        StringBuilder intro;
-        WordGame session;
 
         playing = true;
-        intro = new StringBuilder();
         session = new WordGame();
 
+        displayWelcomeMessage();
 
-        intro.append("Welcome to WordGame! The Geographical Trivia game!\n");
-        intro.append("In this game you need to answer ");
-        intro.append(TOTAL_QUESTIONS);
-        intro.append(" different questions\n");
-        intro.append("You will have TWO attempts at each question! \n");
-        intro.append("First Try gets you ");
-        intro.append(FIRST_TRY_PTS);
-        intro.append(" points\nSecond Try gets you ");
-        intro.append(SECOND_TRY_PTS);
-        intro.append("\nAfter that you get nothing!\n");
-
-        System.out.println(intro);
-
-        do
+        while (playing)
         {
-            StringBuilder playGame;
-            String playerInput;
+            final String playerInput;
 
-            playGame = new StringBuilder();
-
-            playGame.append("Would you like to play word game");
-            playGame.append((session.gamesPlayed == INITIAL_STAT) ? "?" : " again?");
-
-            System.out.println(playGame);
-
-            String[] validInputs = {"yes", "no"};
-
-            playerInput = getValidInput("Type Yes or No", validInputs);
+            playerInput = askToPlay(session.gamesPlayed == INITIAL_STAT);
 
             if (playerInput.equals("yes"))
             {
                 session.playWordGame();
             } else
+
             {
-                Score sessionResults;
-
-                sessionResults = new Score(LocalDateTime.now(),
-                                        session.gamesPlayed,
-                                        session.firstTryAns,
-                                        session.secondTryAns,
-                                        session.incorrectAns);
-                try
-                {
-                    Score.appendScoreToFile(sessionResults, "test.txt");
-                } catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-
-                System.out.println("Thanks for playing!\n");
-                System.out.println(sessionResults);
-
+                endGameSession(session);
                 playing = false;
             }
-        } while(playing);
+        }
     }
 
-    private static int RandValue(final int range)
+    /**
+     * Displays the welcome message with game instructions.
+     */
+    private static void displayWelcomeMessage()
     {
-        Random randomizer;
+        final StringBuilder intro;
 
-        randomizer = new Random();
+        intro = new StringBuilder();
 
-        return randomizer.nextInt(range);
+        intro.append("Welcome to WordGame! The Geographical Trivia game!\n");
+        intro.append("In this game you need to answer ").append(TOTAL_QUESTIONS).append(" different questions\n");
+        intro.append("You will have TWO attempts at each question! \n");
+        intro.append("First Try gets you ").append(FIRST_TRY_PTS).append(" points\n");
+        intro.append("Second Try gets you ").append(SECOND_TRY_PTS).append("\n");
+        intro.append("After that you get nothing!\n");
+
+        System.out.println(intro);
     }
 
+    /**
+     * Asks the player if they want to play (again).
+     *
+     * @param firstTime Whether this is the first time asking
+     * @return The player's response ("yes" or "no")
+     */
+    private static String askToPlay(final boolean firstTime)
+    {
+        final String prompt;
+        prompt = "Would you like to play word game" + (firstTime ? "?" : " again?");
+        return getValidInput(prompt, new String[]{"yes", "no"});
+    }
+
+    /**
+     * Ends the game session and displays results.
+     *
+     * @param session The current game session
+     */
+    private static void endGameSession(final WordGame session)
+    {
+        final Score sessionResults;
+
+        sessionResults = new Score(
+                LocalDateTime.now(),
+                session.gamesPlayed,
+                session.firstTryAns,
+                session.secondTryAns,
+                session.incorrectAns
+        );
+
+        try
+        {
+            Score.appendScoreToFile(sessionResults, "test.txt");
+        } catch (final IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Thanks for playing!\n");
+        System.out.println(sessionResults);
+    }
+
+    /**
+     * Plays a complete word game session with all questions.
+     */
     private void playWordGame()
     {
         this.gamesPlayed++;
 
         for (int i = 0; i < TOTAL_QUESTIONS; i++)
         {
-            int questionNum = RandValue(TOTAL_QUESTION_TYPES);
-
-            switch (questionNum)
+            switch (generateRandomQuestionType())
             {
-                case 0 -> this.identifyCountryByCapital();
-                case 1 -> this.identifyCapitalByCountry();
-                case 2 -> this.identifyCountryByFact();
+                case FIRST_Q -> identifyCountryByCapital();
+                case SECOND_Q -> identifyCapitalByCountry();
+                case THIRD_Q -> identifyCountryByFact();
                 default -> throw new IllegalStateException("Invalid randomizer value");
             }
         }
     }
 
-    private static String getValidInput(final String prompt,
-                                 final String[] validOptions)
+    /**
+     * Generates a random question type index.
+     *
+     * @return A random number between 0 and TOTAL_QUESTION_TYPES-1
+     */
+    private int generateRandomQuestionType()
     {
-        String input;
+        return new Random().nextInt(TOTAL_QUESTION_TYPES);
+    }
+
+    /**
+     * Gets valid input from the player.
+     *
+     * @param prompt The prompt to display
+     * @param validOptions The array of valid options
+     * @return The valid input from the player
+     */
+    private static String getValidInput(final String prompt,
+                                        final String[] validOptions)
+    {
         while (true)
         {
             System.out.println(prompt);
-            input = INPUTSCANNER.nextLine().toLowerCase().trim();
-            for (String option : validOptions) {
-                if (input.equals(option)) {
+            final String input;
+
+            input = INPUT_SCANNER.nextLine().toLowerCase().trim();
+            for (final String option : validOptions)
+            {
+                if (input.equals(option))
+                {
                     return input;
                 }
             }
@@ -150,220 +203,215 @@ public class WordGame
         }
     }
 
-    private int questionGuesses(int guesses,
-                                final String playerGuess,
-                                final int correctIndex,
-                                final String correctAns)
+    /**
+     * Handles the player's guesses for a question.
+     *
+     * @param guesses The current number of guesses
+     * @param playerGuess The player's guess
+     * @param correctIndex The index of the correct answer
+     * @param correctAns The correct answer text
+     * @return The updated number of guesses
+     */
+    private int handleQuestionGuesses(final int guesses,
+                                      final String playerGuess,
+                                      final int correctIndex,
+                                      final String correctAns)
     {
-        if (playerGuess.equals(correctIndex + ANS_INDEX_SHIFT + ""))
+        if (playerGuess.equals(String.valueOf(correctIndex + ANS_INDEX_SHIFT)))
         {
-            switch (guesses)
-            {
-                case FIRST_ANS ->
-                {
-                    System.out.println("Correct on the first try!");
-                    this.firstTryAns++;
-                    guesses = TOTAL_ATTEMPTS;
-                }
-                case SECOND_ANS ->
-                {
-                    System.out.println("Correct on the second try!");
-                    this.secondTryAns++;
-                    guesses = TOTAL_ATTEMPTS;
-                }
-                default -> throw new IllegalStateException("Invalid guesses for correct gameplay");
-            }
+            handleCorrectGuess(guesses);
+            return TOTAL_ATTEMPTS; // Exit loop
         } else
         {
-            System.out.print("Incorrect! ");
-            System.out.println((guesses == FIRST_ANS) ? "try again!\n" : "The answer was "
-                    + correctAns);
-            guesses++;
-            if (guesses == 2)
+            return handleIncorrectGuess(guesses, correctAns);
+        }
+    }
+
+    /**
+     * Handles a correct guess.
+     *
+     * @param guesses The current number of guesses
+     */
+    private void handleCorrectGuess(final int guesses)
+    {
+        switch (guesses)
+        {
+            case FIRST_ANS ->
             {
-                this.incorrectAns++;
+                System.out.println("Correct on the first try!");
+                this.firstTryAns++;
             }
+            case SECOND_ANS ->
+            {
+                System.out.println("Correct on the second try!");
+                this.secondTryAns++;
+            }
+            default -> throw new IllegalStateException("Invalid guesses for correct gameplay");
+        }
+    }
+
+    /**
+     * Handles an incorrect guess.
+     *
+     * @param guesses The current number of guesses
+     * @param correctAns The correct answer text
+     * @return The updated number of guesses
+     */
+    private int handleIncorrectGuess(int guesses,
+                                     final String correctAns)
+    {
+        System.out.print("Incorrect! ");
+        System.out.println((guesses == FIRST_ANS) ? "try again!\n" : "The answer was " + correctAns);
+
+        guesses++;
+        if (guesses == TOTAL_ATTEMPTS)
+        {
+            this.incorrectAns++;
         }
         return guesses;
     }
 
-    private void identifyCapitalByCountry()
-    {
-        Country correctCountry;
-        Country[] selectedCountries;
-        String playerInput;
-        int correctIndex;
-
-        selectedCountries = new Country[TOTAL_ANSWERS];
-
-        correctCountry = COUNTRIES.selectRandCountry();
-
-        correctIndex = RandValue(TOTAL_ANSWERS);
-        selectedCountries[correctIndex] = correctCountry;
-
-        for (int i = 0; i < selectedCountries.length; i++)
-        {
-            if (selectedCountries[i] == null)
-            {
-                do {
-                    selectedCountries[i] = COUNTRIES.selectRandCountry();
-                } while (selectedCountries[i].equals(correctCountry));
-            }
-        }
-
-        StringBuilder question;
-        question = new StringBuilder();
-        question.append("\nWhich is the capital city of ");
-        question.append(correctCountry.getName());
-
-        question.append("\n1-->");
-        question.append(selectedCountries[FIRST_ANS].getCapitalCityName());
-
-        question.append("\n2-->");
-        question.append(selectedCountries[SECOND_ANS].getCapitalCityName());
-
-        question.append("\n3-->");
-        question.append(selectedCountries[THIRD_ANS].getCapitalCityName());
-
-        question.append("\n\ntype in the corresponding number next to the capital!");
-
-        int guesses;
-
-        guesses = INITIAL_STAT;
-
-        do
-        {
-            String[] validInputs = {"1", "2", "3"};
-
-            playerInput = getValidInput(question.toString(),
-                    validInputs);
-
-            guesses = this.questionGuesses(guesses,
-                    playerInput,
-                    correctIndex,
-                    selectedCountries[correctIndex].getCapitalCityName());
-
-        } while(guesses < TOTAL_ATTEMPTS);
-    }
-
-    private static String displayCountryChoices(Country[] countries)
-    {
-        StringBuilder answers;
-
-        answers = new StringBuilder();
-
-        answers.append("\n1-->");
-        answers.append(countries[FIRST_ANS].getName());
-
-        answers.append("\n2-->");
-        answers.append(countries[SECOND_ANS].getName());
-
-        answers.append("\n3-->");
-        answers.append(countries[THIRD_ANS].getName());
-
-        answers.append("\n\ntype in the corresponding number next to the country!");
-
-        return answers.toString();
-    }
-
-    private void identifyCountryByFact()
-    {
-        Country correctCountry;
-        Country[] selectedCountries;
-        String playerInput;
-        int correctIndex;
-
-        selectedCountries = new Country[TOTAL_ANSWERS];
-
-        correctCountry = COUNTRIES.selectRandCountry();
-
-        correctIndex = RandValue(TOTAL_ANSWERS);
-        selectedCountries[correctIndex] = correctCountry;
-
-        for (int i = 0; i < selectedCountries.length; i++)
-        {
-            if (selectedCountries[i] == null)
-            {
-                do {
-                    selectedCountries[i] = COUNTRIES.selectRandCountry();
-                } while (selectedCountries[i].equals(correctCountry));
-            }
-        }
-
-        StringBuilder question;
-        question = new StringBuilder();
-        question.append("\nWhich country does this fact coincide with?\n");
-        question.append(correctCountry.getFact(RandValue(TOTAL_FACTS)));
-
-        question.append(displayCountryChoices(selectedCountries));
-
-        int guesses;
-
-        guesses = INITIAL_STAT;
-
-        do
-        {
-            String[] validInputs = {"1", "2", "3"};
-
-            playerInput = getValidInput(question.toString(),
-                    validInputs);
-
-            guesses = this.questionGuesses(guesses,
-                    playerInput,
-                    correctIndex,
-                    selectedCountries[correctIndex].getName());
-
-        } while(guesses < TOTAL_ATTEMPTS);
-    }
-
+    /**
+     * Identifies a country by its capital city.
+     */
     private void identifyCountryByCapital()
     {
-        Country correctCountry;
-        Country[] selectedCountries;
-        String playerInput;
-        int correctIndex;
+        final Country[] countries;
+        final Country correctCountry;
+        final String question;
 
-        selectedCountries = new Country[TOTAL_ANSWERS];
+        countries = prepareQuestionCountries();
+        correctCountry = countries[getCorrectIndex(countries)];
 
+        question = "\nWhich country does the capital city of " +
+                correctCountry.getCapitalCityName() +
+                displayCountryChoices(countries);
+
+        askQuestion(question, countries, correctCountry.getName());
+    }
+
+    /**
+     * Identifies a capital city by its country.
+     */
+    private void identifyCapitalByCountry() {
+        final Country[] countries;
+        final Country correctCountry;
+        final String question;
+
+        countries = prepareQuestionCountries();
+        correctCountry = countries[getCorrectIndex(countries)];
+
+        question = "\nWhich is the capital city of " +
+                correctCountry.getName() +
+                "\n1-->" + countries[FIRST_ANS].getCapitalCityName() +
+                "\n2-->" + countries[SECOND_ANS].getCapitalCityName() +
+                "\n3-->" + countries[THIRD_ANS].getCapitalCityName() +
+                "\n\ntype in the corresponding number next to the capital!";
+
+        askQuestion(question, countries, correctCountry.getCapitalCityName());
+    }
+
+    /**
+     * Identifies a country by one of its facts.
+     */
+    private void identifyCountryByFact() {
+        final Country[] countries;
+        final Country correctCountry;
+        final String question;
+
+        countries = prepareQuestionCountries();
+        correctCountry = countries[getCorrectIndex(countries)];
+
+        question = "\nWhich country does this fact coincide with?\n" +
+                correctCountry.getFact(new Random().nextInt(TOTAL_FACTS)) +
+                displayCountryChoices(countries);
+
+        askQuestion(question, countries, correctCountry.getName());
+    }
+
+    /**
+     * Prepares an array of countries for a question, with one correct answer.
+     *
+     * @return Array of countries with one correct answer
+     */
+    private Country[] prepareQuestionCountries()
+    {
+        final Country[] countries;
+        final Country correctCountry;
+        final int correctIndex;
+
+        correctIndex = new Random().nextInt(TOTAL_ANSWERS);
+        countries = new Country[TOTAL_ANSWERS];
         correctCountry = COUNTRIES.selectRandCountry();
+        countries[correctIndex] = correctCountry;
 
-        correctIndex = RandValue(TOTAL_ANSWERS);
-        selectedCountries[correctIndex] = correctCountry;
 
-        for (int i = 0; i < selectedCountries.length; i++)
+        for (int i = 0; i < countries.length; i++)
         {
-            if (selectedCountries[i] == null)
+            if (countries[i] == null)
             {
                 do
                 {
-                    selectedCountries[i] = COUNTRIES.selectRandCountry();
-                } while (selectedCountries[i].equals(correctCountry));
+                    countries[i] = COUNTRIES.selectRandCountry();
+                } while (countries[i].equals(correctCountry));
             }
         }
+        return countries;
+    }
 
-        StringBuilder question;
-        question = new StringBuilder();
-        question.append("\nWhich country does the capital city of ");
-        question.append(correctCountry.getCapitalCityName());
+    /**
+     * Gets the index of the correct answer in the countries array.
+     *
+     * @param countries The array of countries
+     * @return The index of the correct answer
+     */
+    private int getCorrectIndex(final Country[] countries)
+    {
+        for (int i = 0; i < countries.length; i++)
+        {
+            if (countries[i] != null)
+            {
+                return i;
+            }
+        }
+        throw new IllegalStateException("No correct answer found");
+    }
 
-        question.append(displayCountryChoices(selectedCountries));
+    /**
+     * Displays the country choices for a question.
+     *
+     * @param countries The array of countries to display
+     * @return The formatted choices string
+     */
+    private static String displayCountryChoices(final Country[] countries)
+    {
+        return "\n1-->" + countries[FIRST_ANS].getName() +
+                "\n2-->" + countries[SECOND_ANS].getName() +
+                "\n3-->" + countries[THIRD_ANS].getName() +
+                "\n\ntype in the corresponding number next to the country!";
+    }
 
+    /**
+     * Asks a question and handles the player's response.
+     *
+     * @param question The question to ask
+     * @param countries The array of countries
+     * @param correctAnswer The correct answer text
+     */
+    private void askQuestion(final String question, final Country[] countries, final String correctAnswer)
+    {
         int guesses;
+        final int correctIndex;
 
+        correctIndex = getCorrectIndex(countries);
         guesses = INITIAL_STAT;
 
         do
         {
-            String[] validInputs = {"1", "2", "3"};
+            final String playerInput;
 
-            playerInput = getValidInput(question.toString(),
-                    validInputs);
-
-            guesses = this.questionGuesses(guesses,
-                    playerInput,
-                    correctIndex,
-                    selectedCountries[correctIndex].getName());
-
-        } while(guesses < TOTAL_ATTEMPTS);
+            playerInput = getValidInput(question, new String[]{"1", "2", "3"});
+            guesses = handleQuestionGuesses(guesses, playerInput, correctIndex, correctAnswer);
+        } while (guesses < TOTAL_ATTEMPTS);
     }
 }
