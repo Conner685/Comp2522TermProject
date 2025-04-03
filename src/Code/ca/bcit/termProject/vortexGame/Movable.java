@@ -2,6 +2,9 @@ package ca.bcit.termProject.vortexGame;
 
 /**
  * Represents an object that can move in the game.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
 public interface Movable
 {

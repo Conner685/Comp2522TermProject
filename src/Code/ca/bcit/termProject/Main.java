@@ -9,8 +9,22 @@ import javafx.stage.Stage;
 
 import java.util.Scanner;
 
+/**
+ * The Main menu for the entire program, starting the java runtime and allowing the user to open games
+ * @author Conner Ponton
+ * @version 1.0
+ */
 public class Main extends Application
 {
+    private static final String WORD_GAME = "w";
+    private static final String NUMBER_GAME = "n";
+    private static final String VORTEX_GAME = "v";
+    private static final String QUIT_GAME = "q";
+
+    /**
+     * Entry point and launches JavaFx
+     * @param args program arguments
+     */
     public static void main(final String[] args)
     {
         launch(args);
@@ -21,7 +35,6 @@ public class Main extends Application
     {
         Platform.setImplicitExit(false);
 
-        //TODO Possible better solution(?) (ask brady he seems to know what he is doing)
         new Thread(() ->
         {
             final Scanner input;
@@ -30,40 +43,31 @@ public class Main extends Application
 
             do
             {
-                //TODO magic strings for W N V Q
-                System.out.println("Press W to play the Word game.");
-                System.out.println("Press N to play the Number game.");
-                System.out.println("Press V to play Vortex.");
-                System.out.println("Press Q to quit.");
+                System.out.println("Press " + WORD_GAME + " to play the Word game.");
+                System.out.println("Press " + NUMBER_GAME + " to play the Number game.");
+                System.out.println("Press " + VORTEX_GAME + " to play Vortex.");
+                System.out.println("Press " + QUIT_GAME + " to quit.");
 
                 choice = input.nextLine();
 
                 switch (choice.toLowerCase())
                 {
-                    case "w" ->
-                    {
-                        WordGame.wordGameMenu();
-                    }
-                    case "n" ->
-                    {
-                        Platform.runLater(() -> new NumberGame().start(new Stage()));
-
-                    }
-
-                    case "v" ->
-                    {
-                        Platform.runLater(() -> new VortexGameEngine().start(new Stage()));
-                    }
-
-                    case "q" ->
-                    {
-                        System.out.println("Exiting...");
-                        Platform.exit();
-                    }
+                    case WORD_GAME ->
+                            WordGame.wordGameMenu();
+                    case NUMBER_GAME ->
+                            Platform.runLater(() ->
+                                new NumberGame().start(new Stage()));
+                    case VORTEX_GAME ->
+                            Platform.runLater(() -> new VortexGameEngine().start(new Stage()));
+                    case QUIT_GAME ->
+                        {
+                            System.out.println("Exiting...");
+                            Platform.exit();
+                        }
                     default -> System.out.println("Invalid input! Please try again!");
                 }
 
-            } while (!choice.equalsIgnoreCase("q"));
+            } while (!choice.equalsIgnoreCase(QUIT_GAME));
 
             input.close();
         }).start();

@@ -13,8 +13,11 @@ import java.util.stream.Collectors;
 
 /**
  * Manages saving and retrieving high scores for the game.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class ScoreManager
+public final class ScoreManager
 {
     /**
      * Saves the provided score to the score file.
@@ -33,9 +36,10 @@ public class ScoreManager
             }
             Files.write(path, (score + "\n").getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
-            e.printStackTrace(); //TODO Improve the error handling
+            System.err.println("Failed to save");
+            e.printStackTrace();
         }
     }
 
@@ -64,11 +68,14 @@ public class ScoreManager
                         .map(Object::toString)
                         .collect(Collectors.toList());
             }
-        } catch (IOException e)
+        } catch (final IOException e)
         {
+            System.err.println("Failed score file read");
             e.printStackTrace();
         }
+
         final List<String> noScores;
+
         noScores = new ArrayList<>();
         noScores.add("No Scores!");
         return noScores;

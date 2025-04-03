@@ -19,8 +19,11 @@ import static ca.bcit.termProject.vortexGame.Star.spawnStars;
 
 /**
  * Represents the main menu screen with leaderboard and start options.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class MainMenu extends Pane
+public final class MainMenu extends Pane
 {
     private static final int MENU_ITEM_SPACING = 8;
     private static final int TITLE_OFFSET_Y = 120;

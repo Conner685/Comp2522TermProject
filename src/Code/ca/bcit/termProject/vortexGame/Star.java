@@ -1,11 +1,16 @@
 package ca.bcit.termProject.vortexGame;
 
 import javafx.scene.effect.BoxBlur;
-import javafx.scene.layout.Pane;
 
 import java.util.Random;
 
-public class Star extends GameObject
+/**
+ * Background stars
+ *
+ * @author Conner Ponton
+ * @version 1.0
+ */
+public final class Star extends GameObject
 {
     private static final Random RAND = new Random();
     private static final int MAX_SIZE = 15;
@@ -16,11 +21,15 @@ public class Star extends GameObject
     private static final BoxBlur STAR_BLUR = new BoxBlur();
     private static final int STAR_BLUR_INTENSITY = 5;
 
+    /**
+     * Background star randomly placed on map
+     */
     public Star()
     {
         super(RAND.nextInt(VortexGameEngine.SCREEN_WIDTH),
                 RAND.nextInt( VortexGameEngine.SCREEN_HEIGHT),
                 RAND.nextInt(MAX_SIZE - MIN_SIZE) + MIN_SIZE);
+
         getStyleClass().add("star");
         setRotate(ROTATION);
         STAR_BLUR.setWidth(STAR_BLUR_INTENSITY);
@@ -29,6 +38,8 @@ public class Star extends GameObject
 
     /**
      * Creates background star elements for visual effect.
+     *
+     * @param gameEngine of the current running game
      */
     public static void spawnStars(final VortexGameEngine gameEngine)
     {

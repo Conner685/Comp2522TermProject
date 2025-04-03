@@ -14,13 +14,17 @@ import static ca.bcit.termProject.vortexGame.Star.spawnStars;
 
 /**
  * Represents the game over screen with options to retry or return to menu.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class GameOverScreen extends Pane
+public final class GameOverScreen extends Pane
 {
     private static final int MENU_ITEM_SPACING = 25;
     private static final int TITLE_OFFSET_Y = 120;
     private static final int SCORE_OFFSET_Y = 180;
     private static final int BUTTON_OFFSET_Y = 240;
+    private static final int QUIT_BUTTON_OFFSET_Y = 2;
     private static final int BUTTON_WIDTH = 240;
     private static final int BUTTON_HEIGHT = 60;
     private static final int TITLE_X_OFFSET = 120;
@@ -35,6 +39,7 @@ public class GameOverScreen extends Pane
 
     /**
      * Constructs the game over screen.
+     *
      * @param gameEngine The game engine instance
      * @param survivalTime The player's survival time in seconds
      */
@@ -88,7 +93,7 @@ public class GameOverScreen extends Pane
                 BUTTON_OFFSET_Y + BUTTON_SPACING, buttonGlow, e -> gameEngine.showMainMenu());
 
         styleButton(quitButton, VortexGameEngine.HALF_SCREEN_WIDTH - HALF_BUTTON_WIDTH,
-                BUTTON_OFFSET_Y + 2 * BUTTON_SPACING, buttonGlow,
+                BUTTON_OFFSET_Y + QUIT_BUTTON_OFFSET_Y * BUTTON_SPACING, buttonGlow,
                 e -> ((Stage) gameEngine.getRoot().getScene().getWindow()).close());
 
         spawnStars(gameEngine);

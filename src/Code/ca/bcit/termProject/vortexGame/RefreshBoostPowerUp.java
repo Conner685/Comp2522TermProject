@@ -1,6 +1,12 @@
 package ca.bcit.termProject.vortexGame;
 
-public class RefreshBoostPowerUp extends PowerUp
+/**
+ * Power that refreshes the players boost
+ *
+ * @author Conner Ponton
+ * @version 1.0
+ */
+public final class RefreshBoostPowerUp extends PowerUp
 {
     /**
      * Refresh boost Power up positioning details and styling
@@ -22,6 +28,5 @@ public class RefreshBoostPowerUp extends PowerUp
     public void applyEffect(final Player player)
     {
         player.resetBoost();
-//        System.out.println("Boost Refreshed");
     }
 }

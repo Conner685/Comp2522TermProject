@@ -4,8 +4,11 @@ import java.util.Random;
 
 /**
  * Represents a projectile in the game that can move towards a target direction.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class Projectile extends GameObject
+public final class Projectile extends GameObject
 {
     private static final int MIN_PROJECTILE_SPEED = 5;
     private static final int MAX_PROJECTILE_SPEED = 20;
@@ -42,14 +45,15 @@ public class Projectile extends GameObject
                       final double size)
     {
         super(x, y, size);
-        if (size <= MIN_SIZE)
-        {
-            throw new IllegalArgumentException("Size must be positive.");
-        }
+
+        validateProjectile(size);
+
+        final double[] direction;
+
+        direction = calculateDirection(x, y);
 
         getStyleClass().add("projectile");
         this.speed = calculateSpeed(size);
-        final double[] direction = calculateDirection(x, y);
         this.directionX = direction[DIR_X];
         this.directionY = direction[DIR_Y];
         this.currRot = RAND.nextDouble(MAX_INITIAL_ANGLE);
@@ -83,7 +87,7 @@ public class Projectile extends GameObject
      * @return an array containing the normalized direction vector [directionX, directionY]
      */
     private double[] calculateDirection(final double x,
-                                        final double y) //TODO Improve so the java gods do not sob
+                                        final double y)
     {
         final double centerX;
         final double centerY;
@@ -99,10 +103,8 @@ public class Projectile extends GameObject
         deltaY= centerY - y;
 
         magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        if (magnitude == MIN_MAG)
-        {
-            throw new IllegalStateException("Direction vector magnitude cannot be zero.");
-        }
+
+        validateMagnitude(magnitude);
 
         return new double[] { deltaX / magnitude, deltaY / magnitude };
     }
@@ -129,5 +131,31 @@ public class Projectile extends GameObject
     {
         return getX() < MAP_EDGE || getX() > screenWidth ||
                 getY() < MAP_EDGE || getY() > screenHeight;
+    }
+
+    /**
+     * validates projectile size
+     *
+     * @param size of projectile
+     */
+    private void validateProjectile(final double size)
+    {
+        if (size <= MIN_SIZE)
+        {
+            throw new IllegalArgumentException("Size must be positive.");
+        }
+    }
+
+    /**
+     * validates the projectiles vector to not be 0
+     *
+     * @param magnitude of projectile vector
+     */
+    private void validateMagnitude(final double magnitude)
+    {
+        if (magnitude == MIN_MAG)
+        {
+            throw new IllegalStateException("Direction vector magnitude cannot be zero.");
+        }
     }
 }

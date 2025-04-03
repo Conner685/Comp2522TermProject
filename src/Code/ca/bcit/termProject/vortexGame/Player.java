@@ -2,8 +2,11 @@ package ca.bcit.termProject.vortexGame;
 
 /**
  * Represents a player in the game that can move and use a boost mechanic.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class Player extends GameObject
+public final class Player extends GameObject
 {
     private static final int SPEED = 5;
     private static final int BOOST_SPEED = 10;
@@ -54,7 +57,6 @@ public class Player extends GameObject
                                final boolean isDPressed,
                                boolean isShiftPressed)
     {
-//        System.out.println("entered update movement");
         double deltaX;
         double deltaY;
 
@@ -89,8 +91,6 @@ public class Player extends GameObject
             isShiftPressed = false;
             boostCut = true;
         }
-
-//        System.out.println(currentBoost);
 
         if (isWPressed) deltaY -= isShiftPressed ? BOOST_SPEED : SPEED;
         if (isSPressed) deltaY += isShiftPressed ? BOOST_SPEED : SPEED;
@@ -162,7 +162,6 @@ public class Player extends GameObject
     public void IncrementSpeedMod(final double increment)
     {
         this.speedModifier += increment;
-//        System.out.println("Current Speed Mod" + speedModifier);
     }
 
     /**
@@ -173,6 +172,5 @@ public class Player extends GameObject
     {
         this.boostLimit += increment;
         this.currentBoost += increment;
-//        System.out.println("Current Boost limit" + boostLimit);
     }
 }

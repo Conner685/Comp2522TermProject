@@ -1,6 +1,13 @@
 package ca.bcit.termProject.vortexGame;
 
-public class SpeedBoostPowerUp extends PowerUp {
+/**
+ * Power that increases the players speed
+ *
+ * @author Conner Ponton
+ * @version 1.0
+ */
+public final class SpeedBoostPowerUp extends PowerUp
+{
     private static final double SPEED_BOOST_FACTOR = .3;
 
     /**

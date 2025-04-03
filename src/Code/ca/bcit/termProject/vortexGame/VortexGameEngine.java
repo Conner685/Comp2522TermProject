@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-import static ca.bcit.termProject.vortexGame.BoostUpPowerUp.BOOST_BAR_SIZE_INCREASE;
 import static ca.bcit.termProject.vortexGame.Player.INITIAL_BOOST_LIMIT;
 import static ca.bcit.termProject.vortexGame.PowerUp.spawnPowerUp;
 import static ca.bcit.termProject.vortexGame.Star.spawnStars;
@@ -23,20 +22,24 @@ import static ca.bcit.termProject.vortexGame.Star.spawnStars;
  * The main game engine class for the Vortex bullet hell game.
  * Manages the game loop, player input, object spawning, collisions, and game state transitions.
  * Extends JavaFX's Application class to provide the game window and rendering system.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
-public class VortexGameEngine extends Application
+public final class VortexGameEngine extends Application
 {
     //Window
-    protected static final int SCREEN_WIDTH = 1000;
-    protected static final int SCREEN_HEIGHT = 750;
-    protected static final double HALF_SCREEN_WIDTH = (double) SCREEN_WIDTH / 2;
-    protected static final double HALF_SCREEN_HEIGHT = (double) SCREEN_HEIGHT / 2;
+    static final int SCREEN_WIDTH = 1000;
+    static final int SCREEN_HEIGHT = 750;
+    static final double HALF_SCREEN_WIDTH = (double) SCREEN_WIDTH / 2;
+    private static final double HALF_SCREEN_HEIGHT = (double) SCREEN_HEIGHT / 2;
 
     //Program Logic
     private static final int INITIAL_STAT = 0;
     private static final double PROJECTILE_SPAWN_EDGE_CHANCE = 0.5;
     private static final long NANOSECONDS_PER_FRAME = 16_000_000;
     private static final int MILLISECONDS_PER_SECOND = 1000;
+    private static final int INIT_LOG_SCALING = 1;
 
     //GUI
     private static final int START_TEXT_OFFSET_X = 70;
@@ -93,11 +96,13 @@ public class VortexGameEngine extends Application
     {
         final VortexGameEngine vortexGameEngine;
         final Scene scene;
+
         vortexGameEngine = new VortexGameEngine();
 
-        scene = new Scene(vortexGameEngine.initilizeContent(), SCREEN_WIDTH, SCREEN_HEIGHT);
+        scene = new Scene(vortexGameEngine.initializeContent(), SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/VortexDesign.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass()
+                .getResource("/VortexDesign.css")).toExternalForm());
 
         primaryStage.setTitle("Vortex - Bullet Hell");
         primaryStage.setScene(scene);
@@ -127,7 +132,11 @@ public class VortexGameEngine extends Application
         root.getChildren().add(new GameOverScreen(this, survivalTime));
     }
 
-    private Pane initilizeContent()
+    /**
+     * initializes the root pane
+     * @return root pane
+     */
+    private Pane initializeContent()
     {
         root = new Pane();
         root.setPrefSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -146,7 +155,6 @@ public class VortexGameEngine extends Application
                 HALF_SCREEN_HEIGHT - HALF_PLAYER_SIZE,
                 PLAYER_SIZE);
         root.getChildren().add(player);
-//        System.out.println("Player init");
 
         startText = new Text("Press Enter to Start");
         startText.getStyleClass().add("start-text");
@@ -169,9 +177,7 @@ public class VortexGameEngine extends Application
 
         root.setOnKeyPressed(e ->
         {
-//            System.out.println(e);
             KeyCode code = e.getCode();
-//            System.out.println(code);
             if (code == KeyCode.W) isWPressed = true;
             if (code == KeyCode.S) isSPressed = true;
             if (code == KeyCode.A) isAPressed = true;
@@ -205,7 +211,7 @@ public class VortexGameEngine extends Application
         player.resetStats();
         gameLoop = new AnimationTimer()
         {
-            private long lastUpdate = 0;
+            private long lastUpdate = INITIAL_STAT;
             @Override
             public void handle(long now)
             {
@@ -228,13 +234,13 @@ public class VortexGameEngine extends Application
      */
     private void update()
     {
+        long currentTime;
+        long survivalTime;
+
         player.updateMovement(isWPressed, isSPressed, isAPressed, isDPressed, isShiftPressed);
         spawnProjectiles();
         moveProjectiles();
         checkCollisions();
-
-        long currentTime;
-        long survivalTime;
 
         currentTime = System.currentTimeMillis();
         survivalTime = (currentTime - startTime) / MILLISECONDS_PER_SECOND;
@@ -260,10 +266,10 @@ public class VortexGameEngine extends Application
         {
             // Logarithmic difficulty scaling
             double progress;
-            progress = Math.min(1.0, (double)survivalTime / TIME_TO_MAX_DIFFICULTY);
+            progress = Math.min(INIT_LOG_SCALING, (double)survivalTime / TIME_TO_MAX_DIFFICULTY);
             projectileSpawnRate = (int)(INITIAL_PROJECTILE_SPAWN_RATE -
                     (INITIAL_PROJECTILE_SPAWN_RATE - MIN_PROJECTILE_SPAWN_RATE) *
-                            Math.log1p(progress * (Math.E - 1)));
+                            Math.log1p(progress * (Math.E - INIT_LOG_SCALING)));
         }
 
         if (survivalTime >= POWER_UP_INITIAL_DELAY &&
@@ -272,7 +278,6 @@ public class VortexGameEngine extends Application
             if (!powerUpSpawnedThisSecond)
             {
                 spawnPowerUp(this);
-//                System.out.println("Power up spawned at: " + survivalTime);
                 powerUpSpawnedThisSecond = true;
             }
         }
@@ -280,8 +285,6 @@ public class VortexGameEngine extends Application
         {
             powerUpSpawnedThisSecond = false;
         }
-
-//        System.out.println(player.getSpeedModifier());
     }
 
     /**
@@ -389,9 +392,10 @@ public class VortexGameEngine extends Application
      */
     private void endGame()
     {
-        currentState = GameState.GAME_OVER;
         final long endTime;
         final long survivalTime;
+
+        currentState = GameState.GAME_OVER;
 
         endTime = System.currentTimeMillis();
         survivalTime = (endTime - startTime) / MILLISECONDS_PER_SECOND;
@@ -404,6 +408,11 @@ public class VortexGameEngine extends Application
         }
     }
 
+    /**
+     * Gets the root
+     *
+     * @return root pane
+     */
     public Pane getRoot()
     {
         return root;

@@ -5,8 +5,12 @@ import javafx.scene.shape.Rectangle;
 /**
  * Simplified version of rectangle to allow for single implementation of Size as well as provide supporting methods
  * for game objects.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
-public abstract class GameObject extends Rectangle implements Movable
+public abstract class GameObject extends Rectangle
+        implements Movable
 {
     public GameObject(final double x,
                       final double y,
@@ -21,7 +25,7 @@ public abstract class GameObject extends Rectangle implements Movable
      * @param deltaX the change in the x-coordinate
      * @param deltaY the change in the y-coordinate
      */
-    public void move(final double deltaX,
+    public final void move(final double deltaX,
                      final double deltaY)
     {
         setX(getX() + deltaX);

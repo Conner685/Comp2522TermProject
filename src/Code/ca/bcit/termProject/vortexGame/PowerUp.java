@@ -8,6 +8,9 @@ import static ca.bcit.termProject.vortexGame.VortexGameEngine.SCREEN_WIDTH;
 /**
  * Functions as a basic template for all power ups, providing an automated size, style affects, and details universal
  * to power ups.
+ *
+ * @author Conner Ponton
+ * @version 1.0
  */
 public abstract class PowerUp extends GameObject
 {
@@ -19,7 +22,7 @@ public abstract class PowerUp extends GameObject
     /**
      * Each power up type used for random selection of children
      */
-    protected enum PowerUpType
+    enum PowerUpType
     {
         SPEED_BOOST,
         BOOST_UP,
@@ -28,6 +31,7 @@ public abstract class PowerUp extends GameObject
 
     /**
      * Base power up template
+     *
      * @param x position
      * @param y position
      * @param type specific power up

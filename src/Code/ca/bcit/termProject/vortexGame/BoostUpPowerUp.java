@@ -1,7 +1,12 @@
 package ca.bcit.termProject.vortexGame;
 
-
-public class BoostUpPowerUp extends PowerUp
+/**
+ * Power that increases the players boost limit
+ *
+ * @author Conner Ponton
+ * @version 1.0
+ */
+public final class BoostUpPowerUp extends PowerUp
 {
     private static final int BOOST_INCREASE = 25;
     public static final double BOOST_BAR_SIZE_INCREASE = BOOST_INCREASE / 100.0;
@@ -23,7 +28,7 @@ public class BoostUpPowerUp extends PowerUp
      * @param player The player to affect
      */
     @Override
-    public void applyEffect(final Player player) //TODO provide visual indicator of increased limit(?) Harass AJ later
+    public void applyEffect(final Player player)
     {
         player.IncrementBoostMod(BOOST_INCREASE);
     }
