@@ -8,15 +8,16 @@ package ca.bcit.termProject.vortexGame;
  */
 public final class Player extends GameObject
 {
-    private static final int SPEED = 5;
-    private static final int BOOST_SPEED = 10;
+    static final int SPEED = 5;
+    static final int BOOST_SPEED = 10;
     public static final int INITIAL_BOOST_LIMIT = 200;
-    private static final int BOOST_DRAIN = 4;
-    private static final int BOOST_REGEN = 1;
+    static final int BOOST_DRAIN = 4;
+    static final int BOOST_REGEN = 1;
     private static final int BOOST_MIN = 0;
     private static final int BOOST_CUT_OFF = INITIAL_BOOST_LIMIT / 2;
     private static final int DELTA_START = 0;
     private static final int STARTING_SPEED_MOD = 1;
+    private static final int MIN_BOUND = 0;
 
     private int currentBoost;
     private boolean boostCut;
@@ -35,6 +36,7 @@ public final class Player extends GameObject
                   final double size)
     {
         super(x, y, size);
+        validateCoordinates(x, y);
         this.currentBoost = INITIAL_BOOST_LIMIT;
         this.boostCut = false;
         this.speedModifier = STARTING_SPEED_MOD;
@@ -172,5 +174,33 @@ public final class Player extends GameObject
     {
         this.boostLimit += increment;
         this.currentBoost += increment;
+    }
+
+    /**
+     * Gets current speed modifier of the player
+     *
+     * @return speedModifier
+     */
+    public double getSpeedModifier()
+    {
+        return speedModifier;
+    }
+
+    /**
+     * Validates player to spawn within proper bounds
+     *
+     * @param x of player
+     * @param y of player
+     */
+    private static void validateCoordinates(final double x,
+                                            final double y)
+    {
+        if (x < MIN_BOUND ||
+                x > VortexGameEngine.SCREEN_WIDTH ||
+                y < MIN_BOUND ||
+                y >= VortexGameEngine.SCREEN_HEIGHT)
+        {
+            throw new IllegalArgumentException("Invalid coordinates");
+        }
     }
 }

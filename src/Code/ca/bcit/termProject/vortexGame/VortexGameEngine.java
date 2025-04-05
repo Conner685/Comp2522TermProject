@@ -16,6 +16,8 @@ import java.util.Random;
 
 import static ca.bcit.termProject.vortexGame.Player.INITIAL_BOOST_LIMIT;
 import static ca.bcit.termProject.vortexGame.PowerUp.spawnPowerUp;
+import static ca.bcit.termProject.vortexGame.Projectile.MAX_PROJECTILE_SIZE;
+import static ca.bcit.termProject.vortexGame.Projectile.MIN_PROJECTILE_SIZE;
 import static ca.bcit.termProject.vortexGame.Star.spawnStars;
 
 /**
@@ -55,10 +57,8 @@ public final class VortexGameEngine extends Application
     //Game Objects
     private static final int POWER_UP_SPAWN_RATE = 5;
     private static final int POWER_UP_INITIAL_DELAY = 5;
-    private static final int PLAYER_SIZE = 30;
+    static final int PLAYER_SIZE = 30;
     private static final double HALF_PLAYER_SIZE = (double) PLAYER_SIZE / 2;
-    private static final int MIN_PROJECTILE_SIZE = 10;
-    private static final int MAX_PROJECTILE_SIZE = 60;
     private static final int INITIAL_PROJECTILE_SPAWN_RATE = 50;
     private static final int MIN_PROJECTILE_SPAWN_RATE = 10;
     private static final int TIME_TO_MAX_DIFFICULTY = 60;     // 1 minutes to reach max difficulty
@@ -331,10 +331,10 @@ public final class VortexGameEngine extends Application
      */
     private void moveProjectiles()
     {
-        List<Projectile> projectilesToRemove = new ArrayList<>();
-
-        // Create a copy of the children list to avoid ConcurrentModificationException
+        final List<Projectile> projectilesToRemove;
         final List<javafx.scene.Node> childrenCopy;
+
+        projectilesToRemove = new ArrayList<>();
         childrenCopy = new ArrayList<>(root.getChildren());
 
         childrenCopy.forEach(node ->
@@ -358,10 +358,9 @@ public final class VortexGameEngine extends Application
     private void checkCollisions()
     {
         final List<GameObject> objectsToRemove;
-        objectsToRemove = new ArrayList<>();
-
-        // Create a copy of the children list to avoid ConcurrentModificationException
         final List<javafx.scene.Node> childrenCopy;
+
+        objectsToRemove = new ArrayList<>();
         childrenCopy = new ArrayList<>(root.getChildren());
 
         childrenCopy.forEach(node ->

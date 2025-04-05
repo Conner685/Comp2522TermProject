@@ -14,7 +14,7 @@ import static ca.bcit.termProject.vortexGame.VortexGameEngine.SCREEN_WIDTH;
  */
 public abstract class PowerUp extends GameObject
 {
-    private static final int POWER_UP_SIZE = 20;
+    static final int POWER_UP_SIZE = 20;
     private static final int POWER_UP_ANGLE = 45;
     private static final PowerUpType[] POWER_UP_TYPES = PowerUpType.values();
 

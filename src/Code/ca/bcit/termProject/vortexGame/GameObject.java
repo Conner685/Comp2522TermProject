@@ -12,11 +12,14 @@ import javafx.scene.shape.Rectangle;
 public abstract class GameObject extends Rectangle
         implements Movable
 {
+    private static final int MIN_SIZE = 0;
+
     public GameObject(final double x,
                       final double y,
                       final double size)
     {
         super(x, y, size, size);
+        validateSize(size);
     }
 
     /**
@@ -31,4 +34,18 @@ public abstract class GameObject extends Rectangle
         setX(getX() + deltaX);
         setY(getY() + deltaY);
     }
+
+    /**
+     * Validates objects do not spawn with a negative size.
+     *
+     * @param size of object
+     */
+    private static void validateSize(final double size)
+    {
+        if (size <= MIN_SIZE)
+        {
+            throw new IllegalArgumentException("Cannot have negative size");
+        }
+    }
+
 }

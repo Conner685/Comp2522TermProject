@@ -8,7 +8,7 @@ package ca.bcit.termProject.vortexGame;
  */
 public final class BoostUpPowerUp extends PowerUp
 {
-    private static final int BOOST_INCREASE = 25;
+    static final int BOOST_INCREASE = 25;
     public static final double BOOST_BAR_SIZE_INCREASE = BOOST_INCREASE / 100.0;
 
     /**

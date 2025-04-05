@@ -8,7 +8,7 @@ package ca.bcit.termProject.vortexGame;
  */
 public final class SpeedBoostPowerUp extends PowerUp
 {
-    private static final double SPEED_BOOST_FACTOR = .3;
+    static final double SPEED_BOOST_FACTOR = .2;
 
     /**
      * SpeedBoost Power up positioning details and styling

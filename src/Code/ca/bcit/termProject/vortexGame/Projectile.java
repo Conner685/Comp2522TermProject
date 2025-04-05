@@ -12,11 +12,13 @@ public final class Projectile extends GameObject
 {
     private static final int MIN_PROJECTILE_SPEED = 5;
     private static final int MAX_PROJECTILE_SPEED = 20;
-    private static final int SIZE_SPEED_MODIFIER  = 5; // Modifier for speed based on projectile size
-    private static final int CENTER_BOX_MAX       = 550; // Max bound for the center of the screen
-    private static final int CENTER_BOX_MIN       = 200; // Min bound for the center of the screen
-    private static final int MAP_EDGE             = -100; // Edge of the screen with space for projectiles
-    private static final int MIN_SIZE_AFFECT      = 10; // Minimum size to affect speed calculation
+    static final int MIN_PROJECTILE_SIZE          = 10;
+    static final int MAX_PROJECTILE_SIZE          = 60;
+    private static final int SIZE_SPEED_MODIFIER  = 5;
+    private static final int CENTER_BOX_MAX       = 550;
+    private static final int CENTER_BOX_MIN       = 200;
+    private static final int MAP_EDGE             = -100;
+    private static final int MIN_SIZE_AFFECT      = 10;
     private static final Random RAND = new Random();
     private static final int DIR_X = 0;
     private static final int DIR_Y = 1;
@@ -140,7 +142,8 @@ public final class Projectile extends GameObject
      */
     private void validateProjectile(final double size)
     {
-        if (size <= MIN_SIZE)
+        if (size < MIN_PROJECTILE_SIZE ||
+            size > MAX_PROJECTILE_SIZE)
         {
             throw new IllegalArgumentException("Size must be positive.");
         }
