@@ -1,23 +1,61 @@
 Lesson 1:
+Throughout my game I have implemented extensive amounts of classes and methods that all interact with one another,
+Using string builder to create messages to the user. I have focused heavily on style removing any non data magic numbers
+and following any form of style requirements.
 
 Lesson 2:
+Inheritance was used extensively to extend various javafx classes such as application, Pane and Rectangle to create
+various game objects. I had overridden various methods from it, mainly the Start method to launch the GUI application.
+In my actual game I had utilized multiple abstract classes such as GameObject and PowerUp which functioned as the
+baselines for every component of the game. Where GameObject had handled the conversions from Rectangle into an easily
+created format with validation for the objects size. With PowerUps being an a generalized power up class that was
+used as a template for each power up in the game. The implementation of power ups involved extensive substitution
+where a general power up is made and substituted for a randomly selected subclass.
 
 Lesson 3:
+As stated before multiple abstract classes were used to create general templates for important game objects and to
+simplify implementation. Utilizing substitution and extensive abstraction to improve readability and modularity of the
+code.
 
 Lesson 4:
+I had designed a functional interface called moveable which was implemented into GameObject to allow for GameObjects
+to be able to move. It simply takes in the DeltaX and DeltaY and applies the calculation in the GameObject class.
 
 Lesson 5:
+I have utilized multiple collections for tracking GameObjects in the game. Projectiles, PowerUps, and any functional
+GameObject gets tracked and checks to see if the objects need deletion. Due to the volume of projectiles, I utilized
+a list that keeps track of any objects that need to be deleted in a given instance and deletes them all at once instead
+of many repeated deletions.
 
 Lesson 6:
+I used various nested classes for the sake of manipulating and dynamically changing the animation timer to keep things
+on the correct timescale and synced with framerate. It helped to minimized disconnection from collisions and what the
+player see's.
 
 Lesson 7:
+For interaction handling, lambda expressions were often used to simplify the expressions. With things like method
+references being used in the streaming of high scores to simplify the filters. Furthermore, as stated prior I had made
+a moveable functional interface to represent GameObjects being Movable to help simplify and make movement logic more
+modular.
 
 Lesson 8:
+Streaming was used to manage user high scores and filter them into the top scores which are displayed for the player
+each time they play. Making sure there is a file for the scores to go into and if not creating one through the saved
+path.
 
 Lesson 9:
+The entire game was made with GUI with multiple classes handling different scenes for the main menu, actual game, and
+game over screen. I had made sure to launch JavaFx on a separate thread to allow for the games to be relaunched without
+conflict with existing GUI instances.
 
 Lesson 10:
+I had included a test file that checked all forms of validation within my game. Making sure each GameObject cannot
+initialize incorrectly. Checking things from size to positioning on the game screen.
 
 Lesson 11:
+When designing the GameObjects I had made sure to follow an abstract factory design pattern, making the initial
+GameObject factory and creating different objects from there, or extending the production line with the PowerUp factory.
 
 Lesson 12:
+Concurrency was used in the launching of various instances of JavaFx, using run later to allow for multiple instances
+of it to exist. Furthermore, creating a separate thread for it to exist and launch from.

@@ -6,6 +6,7 @@ package ca.bcit.termProject.vortexGame;
  * @author Conner Ponton
  * @version 1.0
  */
+@FunctionalInterface
 public interface Movable
 {
     /**

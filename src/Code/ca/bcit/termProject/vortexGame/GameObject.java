@@ -28,6 +28,7 @@ public abstract class GameObject extends Rectangle
      * @param deltaX the change in the x-coordinate
      * @param deltaY the change in the y-coordinate
      */
+    @Override
     public final void move(final double deltaX,
                      final double deltaY)
     {
