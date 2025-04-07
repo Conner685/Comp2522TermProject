@@ -2,6 +2,7 @@ package ca.bcit.termProject.wordGame;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -38,6 +39,7 @@ public final class WordGame
     private int firstTryAns;
     private int secondTryAns;
     private int incorrectAns;
+    private int currentIndex;
 
     private WordGame()
     {
@@ -137,7 +139,7 @@ public final class WordGame
 
         try
         {
-            Score.appendScoreToFile(sessionResults, "test.txt");
+            Score.appendScoreToFile(sessionResults, "src/res/test.txt");
         } catch (final IOException e)
         {
             throw new RuntimeException(e);
@@ -281,7 +283,7 @@ public final class WordGame
         final String question;
 
         countries = prepareQuestionCountries();
-        correctCountry = countries[getCorrectIndex(countries)];
+        correctCountry = countries[currentIndex];
 
         question = "\nWhich country does the capital city of " +
                 correctCountry.getCapitalCityName() +
@@ -299,7 +301,7 @@ public final class WordGame
         final String question;
 
         countries = prepareQuestionCountries();
-        correctCountry = countries[getCorrectIndex(countries)];
+        correctCountry = countries[currentIndex];
 
         question = "\nWhich is the capital city of " +
                 correctCountry.getName() +
@@ -320,7 +322,7 @@ public final class WordGame
         final String question;
 
         countries = prepareQuestionCountries();
-        correctCountry = countries[getCorrectIndex(countries)];
+        correctCountry = countries[currentIndex];
 
         question = "\nWhich country does this fact coincide with?\n" +
                 correctCountry.getFact(new Random().nextInt(TOTAL_FACTS)) +
@@ -338,13 +340,13 @@ public final class WordGame
     {
         final Country[] countries;
         final Country correctCountry;
-        final int correctIndex;
 
-        correctIndex = new Random().nextInt(TOTAL_ANSWERS);
+        currentIndex = new Random().nextInt(TOTAL_ANSWERS);
+        System.out.println(currentIndex);
         countries = new Country[TOTAL_ANSWERS];
         correctCountry = COUNTRIES.selectRandCountry();
-        countries[correctIndex] = correctCountry;
 
+        countries[currentIndex] = correctCountry;
 
         for (int i = 0; i < countries.length; i++)
         {
@@ -357,24 +359,6 @@ public final class WordGame
             }
         }
         return countries;
-    }
-
-    /**
-     * Gets the index of the correct answer in the countries array.
-     *
-     * @param countries The array of countries
-     * @return The index of the correct answer
-     */
-    private int getCorrectIndex(final Country[] countries)
-    {
-        for (int i = 0; i < countries.length; i++)
-        {
-            if (countries[i] != null)
-            {
-                return i;
-            }
-        }
-        throw new IllegalStateException("No correct answer found");
     }
 
     /**
@@ -398,12 +382,13 @@ public final class WordGame
      * @param countries The array of countries
      * @param correctAnswer The correct answer text
      */
-    private void askQuestion(final String question, final Country[] countries, final String correctAnswer)
+    private void askQuestion(final String question,
+                             final Country[] countries,
+                             final String correctAnswer)
     {
         int guesses;
         final int correctIndex;
 
-        correctIndex = getCorrectIndex(countries);
         guesses = INITIAL_STAT;
 
         do
@@ -411,7 +396,7 @@ public final class WordGame
             final String playerInput;
 
             playerInput = getValidInput(question, new String[]{"1", "2", "3"});
-            guesses = handleQuestionGuesses(guesses, playerInput, correctIndex, correctAnswer);
+            guesses = handleQuestionGuesses(guesses, playerInput, currentIndex, correctAnswer);
         } while (guesses < TOTAL_ATTEMPTS);
     }
 }

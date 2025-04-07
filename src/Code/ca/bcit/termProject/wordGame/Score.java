@@ -131,7 +131,8 @@ public final class Score
      * @return A list of Score objects read from the file
      * @throws IOException If an I/O error occurs while reading the file
      */
-    public static List<Score> readScoresFromFile(final String fileName) throws IOException
+    public static List<Score> readScoresFromFile(final String fileName)
+                                                throws IOException
     {
         final List<Score> scores;
 

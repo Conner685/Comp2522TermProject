@@ -40,7 +40,9 @@ public final class World
                 i = 'y';
             }
 
-            String currentFile = "src/res/" + i + ".txt";
+            final String currentFile;
+
+            currentFile = "src/res/" + i + ".txt";
 
             try
             {
