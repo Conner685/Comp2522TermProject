@@ -3,30 +3,60 @@ package ca.bcit.termProject.vortexGame;
 import java.util.Random;
 
 /**
- * Represents a projectile in the game that can move towards a target direction.
+ * Represents enemy projectiles that pose obstacles to the player in the game world.
+ *
+ * <p>Each projectile has randomized characteristics including:
+ * <ul>
+ *   <li>Size (within defined bounds)</li>
+ *   <li>Movement speed (inversely related to size)</li>
+ *   <li>Direction (toward random center point)</li>
+ *   <li>Rotation behavior</li>
+ * </ul>
+ *
+ * <p>Key Characteristics:
+ * <table border="1">
+ *   <tr><th>Attribute</th><th>Range</th></tr>
+ *   <tr><td>Size</td><td>10-60 pixels</td></tr>
+ *   <tr><td>Speed</td><td>5-20 units/frame</td></tr>
+ *   <tr><td>Rotation</td><td>Random angular velocity</td></tr>
+ *   <tr><td>Lifetime</td><td>Until exiting screen bounds</td></tr>
+ * </table>
+ *
+ * <p>Movement Physics:
+ * <ul>
+ *   <li>Speed inversely proportional to size (larger = slower)</li>
+ *   <li>Direction vector points toward random screen center point</li>
+ *   <li>Rotation direction randomly clockwise/counter-clockwise</li>
+ *   <li>Movement unaffected by game difficulty</li>
+ * </ul>
  *
  * @author Conner Ponton
  * @version 1.0
  */
 public final class Projectile extends GameObject
 {
+    /**
+     * Minimal Projectile Size
+     */
+    static final int MIN_PROJECTILE_SIZE          = 10;
+    /**
+     * Maximum Projectile Size
+     */
+    static final int MAX_PROJECTILE_SIZE          = 60;
     private static final int MIN_PROJECTILE_SPEED = 5;
     private static final int MAX_PROJECTILE_SPEED = 20;
-    static final int MIN_PROJECTILE_SIZE          = 10;
-    static final int MAX_PROJECTILE_SIZE          = 60;
     private static final int SIZE_SPEED_MODIFIER  = 5;
     private static final int CENTER_BOX_MAX       = 550;
     private static final int CENTER_BOX_MIN       = 200;
     private static final int MAP_EDGE             = -100;
     private static final int MIN_SIZE_AFFECT      = 10;
-    private static final Random RAND = new Random();
-    private static final int DIR_X = 0;
-    private static final int DIR_Y = 1;
-    private static final int MIN_SIZE = 0;
-    private static final int MAX_INITIAL_ANGLE = 90;
-    private static final int RIGHT = 3;
-    private static final int LEFT = 1;
-    private static final int MIN_MAG = 0;
+    private static final Random RAND            = new Random();
+    private static final int DIR_X              = 0;
+    private static final int DIR_Y              = 1;
+    private static final int MAX_INITIAL_ANGLE  = 90;
+    private static final int RIGHT      = 3;
+    private static final int LEFT       = 1;
+    private static final int MIN_MAG    = 0;
 
     private final double directionX;
     private final double directionY;
@@ -35,12 +65,19 @@ public final class Projectile extends GameObject
     private final int rotDir;
 
     /**
-     * Constructs a Projectile with the specified position and size.
+     * Constructs a new projectile with randomized movement characteristics.
      *
-     * @param x    the x-coordinate of the projectile
-     * @param y    the y-coordinate of the projectile
-     * @param size the size of the projectile (must be positive)
-     * @throws IllegalArgumentException if size is not positive
+     * <p>The projectile will:
+     * <ul>
+     *   <li>Appear at specified coordinates</li>
+     *   <li>Have CSS class "projectile" for styling</li>
+     *   <li>Move toward random center-screen point</li>
+     *   <li>Rotate with random angular velocity</li>
+     * </ul>
+     *
+     * @param x The horizontal spawn coordinate (in pixels)
+     * @param y The vertical spawn coordinate (in pixels)
+     * @param size The diameter of the projectile (10-60 pixels)
      */
     public Projectile(final double x,
                       final double y,
@@ -55,38 +92,86 @@ public final class Projectile extends GameObject
         direction = calculateDirection(x, y);
 
         getStyleClass().add("projectile");
-        this.speed = calculateSpeed(size);
+        this.speed      = calculateSpeed(size);
         this.directionX = direction[DIR_X];
         this.directionY = direction[DIR_Y];
-        this.currRot = RAND.nextDouble(MAX_INITIAL_ANGLE);
-        this.rotDir = RAND.nextInt(RIGHT) - LEFT;
+        this.currRot    = RAND.nextDouble(MAX_INITIAL_ANGLE);
+        this.rotDir     = RAND.nextInt(RIGHT) - LEFT;
     }
 
     /**
-     * Calculates the speed of the projectile based on its size.
+     * Determines if projectile has exited playable area.
      *
-     * @param size the size of the projectile
-     * @return the calculated speed
+     * <p>Uses expanded bounds (100px beyond screen edges) before culling
+     * to prevent visible popping at screen edges.
+     *
+     * @param screenWidth The current screen width in pixels
+     * @param screenHeight The current screen height in pixels
+     * @return true if projectile is fully outside culling bounds
+     */
+    public boolean isOffScreen(final int screenWidth,
+                               final int screenHeight)
+    {
+        return getX() < MAP_EDGE || getX() > screenWidth ||
+                getY() < MAP_EDGE || getY() > screenHeight;
+    }
+
+    /**
+     * Updates projectile position and rotation each frame.
+     *
+     * <p>Applies the following movement logic:
+     * <ul>
+     *   <li>Linear movement along pre-calculated direction vector</li>
+     *   <li>Continuous rotation with random angular velocity</li>
+     *   <li>Speed determined by initial size calculation</li>
+     * </ul>
+     */
+    public void updateMovement()
+    {
+        setRotate(currRot);
+        move(directionX * speed, directionY * speed);
+        currRot += RAND.nextInt(speed) * rotDir;
+    }
+
+    /*
+     * Calculates movement speed based on projectile size.
+     *
+     * <p>Implements inverse relationship where:
+     * <ul>
+     *   <li>Small projectiles (≤10px) get full random speed range</li>
+     *   <li>Larger projectiles have speed reduced by size/5</li>
+     * </ul>
+     *
+     * @param size The diameter of the projectile
+     * @return Calculated speed in range 5-20 units/frame
      */
     private int calculateSpeed(final double size)
     {
         if (size < MIN_SIZE_AFFECT)
         {
-            return RAND.nextInt((MAX_PROJECTILE_SPEED - MIN_PROJECTILE_SPEED)) + MIN_PROJECTILE_SPEED;
+            return RAND.nextInt((MAX_PROJECTILE_SPEED - MIN_PROJECTILE_SPEED))
+                    + MIN_PROJECTILE_SPEED;
         }
         else
         {
-            return RAND.nextInt((MAX_PROJECTILE_SPEED - MIN_PROJECTILE_SPEED - ((int)size / SIZE_SPEED_MODIFIER)))
+            return RAND.nextInt((MAX_PROJECTILE_SPEED - MIN_PROJECTILE_SPEED
+                    - ((int)size / SIZE_SPEED_MODIFIER)))
                     + MIN_PROJECTILE_SPEED;
         }
     }
 
-    /**
-     * Calculates the direction vector towards a random point within the center bounds of the screen.
+    /*
+     * Generates normalized direction vector toward random screen center point.
      *
-     * @param x the x-coordinate of the projectile
-     * @param y the y-coordinate of the projectile
-     * @return an array containing the normalized direction vector [directionX, directionY]
+     * <p>Target points are constrained to:
+     * <ul>
+     *   <li>X: 200-750px (avoid edges)</li>
+     *   <li>Y: 200-750px (avoid edges)</li>
+     * </ul>
+     *
+     * @param x The projectile's current x-coordinate
+     * @param y The projectile's current y-coordinate
+     * @return Normalized direction vector [x,y]
      */
     private double[] calculateDirection(final double x,
                                         final double y)
@@ -111,31 +196,7 @@ public final class Projectile extends GameObject
         return new double[] { deltaX / magnitude, deltaY / magnitude };
     }
 
-    /**
-     * Updates the projectile's movement based on its speed and direction.
-     */
-    public void updateMovement()
-    {
-        setRotate(currRot);
-        move(directionX * speed, directionY * speed);
-        currRot += RAND.nextInt(speed) * rotDir;
-    }
-
-    /**
-     * Checks if the projectile is off the screen.
-     *
-     * @param screenWidth  the width of the screen
-     * @param screenHeight the height of the screen
-     * @return true if the projectile is off the screen, false otherwise
-     */
-    public boolean isOffScreen(final int screenWidth,
-                               final int screenHeight)
-    {
-        return getX() < MAP_EDGE || getX() > screenWidth ||
-                getY() < MAP_EDGE || getY() > screenHeight;
-    }
-
-    /**
+    /*
      * validates projectile size
      *
      * @param size of projectile
@@ -149,7 +210,7 @@ public final class Projectile extends GameObject
         }
     }
 
-    /**
+    /*
      * validates the projectiles vector to not be 0
      *
      * @param magnitude of projectile vector

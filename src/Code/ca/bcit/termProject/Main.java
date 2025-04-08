@@ -10,20 +10,46 @@ import javafx.stage.Stage;
 import java.util.Scanner;
 
 /**
- * The Main menu for the entire program, starting the java runtime and allowing the user to open games
+ * Central hub for launching different game applications within the program.
+ *
+ * <p>This class serves as:
+ * <ul>
+ *   <li>The JavaFX application entry point</li>
+ *   <li>Console-based game selection menu</li>
+ *   <li>Game session lifecycle manager</li>
+ * </ul>
+ *
+ * <p>Available Games:
+ * <table border="1">
+ *   <tr><th>Command</th><th>Game</th></tr>
+ *   <tr><td>w</td><td>Word Game (geographical trivia)</td></tr>
+ *   <tr><td>n</td><td>Number Game (placement puzzle)</td></tr>
+ *   <tr><td>v</td><td>Vortex (bullet hell arcade)</td></tr>
+ *   <tr><td>q</td><td>Quit program</td></tr>
+ * </table>
+ *
+ * <p>Technical Implementation:
+ * <ul>
+ *   <li>Uses JavaFX application framework</li>
+ *   <li>Runs console menu in separate thread</li>
+ *   <li>Manages cross-thread JavaFX launches</li>
+ *   <li>Handles graceful shutdown</li>
+ * </ul>
+ *
  * @author Conner Ponton
  * @version 1.0
  */
 public class Main extends Application
 {
-    private static final String WORD_GAME = "w";
+    private static final String WORD_GAME   = "w";
     private static final String NUMBER_GAME = "n";
     private static final String VORTEX_GAME = "v";
-    private static final String QUIT_GAME = "q";
+    private static final String QUIT_GAME   = "q";
 
     /**
      * Entry point and launches JavaFx
-     * @param args program arguments
+     *
+     * @param args command-line arguments
      */
     public static void main(final String[] args)
     {
@@ -31,9 +57,16 @@ public class Main extends Application
     }
 
     /**
-     * Creates the main stage which games will launch from
+     * Configures and displays the game selection interface.
      *
-     * @param primaryStage for games
+     * <p>Initialization includes:
+     * <ul>
+     *   <li>Setting up JavaFX implicit exit behavior</li>
+     *   <li>Launching console interface thread</li>
+     *   <li>Preparing game staging environment</li>
+     * </ul>
+     *
+     * @param primaryStage The root JavaFX container
      */
     @Override
     public void start(final Stage primaryStage)

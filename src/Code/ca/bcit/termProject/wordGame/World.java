@@ -7,26 +7,55 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * Represents a world containing countries loaded from data files.
- * This class loads country data from text files and provides access to random countries.
+ * Data repository class that loads and manages country information from text files.
+ *
+ * <p>This class serves as the data layer for geographical trivia games, providing:
+ * <ul>
+ *   <li>File-based country data loading</li>
+ *   <li>In-memory storage of country details</li>
+ *   <li>Random country selection</li>
+ *   <li>Data validation and error handling</li>
+ * </ul>
+ *
+ * <p>Data File Requirements:
+ * <table border="1">
+ *   <tr><th>Attribute</th><th>Format</th></tr>
+ *   <tr><td>File Location</td><td>src/res/[a-z].txt (excluding some letters)</td></tr>
+ *   <tr><td>Country Entry</td><td>CountryName:CapitalCity</td></tr>
+ *   <tr><td>Facts</td><td>3 lines following each country entry</td></tr>
+ * </table>
+ *
+ * <p>Implementation Details:
+ * <ul>
+ *   <li>Uses HashMap for O(1) country name lookups</li>
+ *   <li>Handles missing files gracefully</li>
+ *   <li>Validates data format during loading</li>
+ *   <li>Provides thread-safe read operations</li>
+ * </ul>
  *
  * @author Conner Ponton
  * @version 1.0
  */
 public final class World
 {
-    private static final int NAME_INDEX     = 0;
-    private static final int CAPITAL_INDEX  = 1;
-    private static final int FIRST_COUNTRY  = 0;
+    private static final int NAME_INDEX         = 0;
+    private static final int CAPITAL_INDEX      = 1;
+    private static final int FIRST_COUNTRY      = 0;
     private static final int VALID_COUNTRY_DATA = 2;
-    private static final int MAX_FACTS      = 3;
+    private static final int MAX_FACTS          = 3;
 
     private final HashMap<String, Country> countries;
 
     /**
      * Constructs a new World by loading country data from files.
-     * Files are expected to be in src/res/ directory named a.txt through z.txt,
-     * excluding some letters. Each file contains country data in specific format.
+     *
+     * <p>Loading Process:
+     * <ol>
+     *   <li>Scans files from a.txt to z.txt (skipping certain letters)</li>
+     *   <li>Parses each line as country:capital pairs</li>
+     *   <li>Reads subsequent 3 lines as country facts</li>
+     *   <li>Validates format before creating Country objects</li>
+     * </ol>
      */
     public World()
     {
@@ -102,9 +131,9 @@ public final class World
     }
 
     /**
-     * Selects and returns a random country from the world.
+     * Selects a random country from the loaded dataset.
      *
-     * @return a randomly selected Country object
+     * @return uniformly distributed random Country object
      */
     public Country selectRandCountry()
     {

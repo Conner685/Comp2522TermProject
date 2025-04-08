@@ -13,7 +13,31 @@ import javafx.scene.paint.Color;
 import static ca.bcit.termProject.vortexGame.Star.spawnStars;
 
 /**
- * Represents the game over screen with options to retry or return to menu.
+ * Represents the game over screen displayed after player defeat.
+ *
+ * <p>This screen provides:
+ * <ul>
+ *   <li>Final survival time display</li>
+ *   <li>Options to retry or return to main menu</li>
+ *   <li>Dramatic visual presentation</li>
+ *   <li>Consistent UI styling</li>
+ * </ul>
+ *
+ * <p>UI Characteristics:
+ * <table border="1">
+ *   <tr><th>Component</th><th>Features</th></tr>
+ *   <tr><td>Title</td><td>Red-tinged drop shadow, large font</td></tr>
+ *   <tr><td>Score Display</td><td>Formatted survival time</td></tr>
+ *   <tr><td>Buttons</td><td>Glow effect on hover, consistent sizing</td></tr>
+ *   <tr><td>Background</td><td>Animated star particles</td></tr>
+ * </table>
+ *
+ * <p>Behavioral Flow:
+ * <ul>
+ *   <li>Retry - Immediately starts new game</li>
+ *   <li>Main Menu - Returns to title screen</li>
+ *   <li>Quit - Exits application</li>
+ * </ul>
  *
  * @author Conner Ponton
  * @version 1.0
@@ -38,10 +62,18 @@ public final class GameOverScreen extends Pane
     private final long survivalTime;
 
     /**
-     * Constructs the game over screen.
+     * Constructs a new game over screen with survival statistics.
      *
-     * @param gameEngine The game engine instance
-     * @param survivalTime The player's survival time in seconds
+     * <p>Initialization includes:
+     * <ul>
+     *   <li>Displaying final survival time</li>
+     *   <li>Creating navigation options</li>
+     *   <li>Setting up visual effects</li>
+     *   <li>Adding background elements</li>
+     * </ul>
+     *
+     * @param gameEngine The main game controller
+     * @param survivalTime Player's survival duration in seconds
      */
     public GameOverScreen(final VortexGameEngine gameEngine,
                           final long survivalTime)
@@ -51,7 +83,7 @@ public final class GameOverScreen extends Pane
         createContent();
     }
 
-    /**
+    /*
      * Creates and configures the game over content with enhanced UI elements.
      */
     private void createContent()
@@ -76,23 +108,23 @@ public final class GameOverScreen extends Pane
         // Title styling
         title.getStyleClass().add("game-over-title");
         title.setEffect(textShadow);
-        title.setX(VortexGameEngine.HALF_SCREEN_WIDTH - TITLE_X_OFFSET);
+        title.setX(VortexGameEngine.HALF_SCREEN_WIDTH_PX - TITLE_X_OFFSET);
         title.setY(TITLE_OFFSET_Y);
 
         // Score styling
         scoreText.getStyleClass().add("game-over-score");
         scoreText.setEffect(textShadow);
-        scoreText.setX(VortexGameEngine.HALF_SCREEN_WIDTH - TITLE_X_OFFSET);
+        scoreText.setX(VortexGameEngine.HALF_SCREEN_WIDTH_PX - TITLE_X_OFFSET);
         scoreText.setY(SCORE_OFFSET_Y);
 
         // Button styling and effects
-        styleButton(retryButton, VortexGameEngine.HALF_SCREEN_WIDTH - HALF_BUTTON_WIDTH,
+        styleButton(retryButton, VortexGameEngine.HALF_SCREEN_WIDTH_PX - HALF_BUTTON_WIDTH,
                 BUTTON_OFFSET_Y, buttonGlow, e -> gameEngine.startGame());
 
-        styleButton(menuButton, VortexGameEngine.HALF_SCREEN_WIDTH - HALF_BUTTON_WIDTH,
+        styleButton(menuButton, VortexGameEngine.HALF_SCREEN_WIDTH_PX - HALF_BUTTON_WIDTH,
                 BUTTON_OFFSET_Y + BUTTON_SPACING, buttonGlow, e -> gameEngine.showMainMenu());
 
-        styleButton(quitButton, VortexGameEngine.HALF_SCREEN_WIDTH - HALF_BUTTON_WIDTH,
+        styleButton(quitButton, VortexGameEngine.HALF_SCREEN_WIDTH_PX - HALF_BUTTON_WIDTH,
                 BUTTON_OFFSET_Y + QUIT_BUTTON_OFFSET_Y * BUTTON_SPACING, buttonGlow,
                 e -> ((Stage) gameEngine.getRoot().getScene().getWindow()).close());
 
@@ -101,7 +133,8 @@ public final class GameOverScreen extends Pane
     }
 
     /**
-     * Styles a button with consistent appearance and hover effects.
+     * Applies standardized styling to navigation buttons.
+     *
      * @param button The button to style
      * @param x X position
      * @param y Y position

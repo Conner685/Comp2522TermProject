@@ -14,8 +14,35 @@ import java.util.Objects;
 import java.util.Random;
 
 /**
- * The NumberGame class implements a simple number placement game using JavaFX.
- * The player must place randomly generated numbers in ascending order on a 4x5 grid.
+ * A JavaFX implementation of a number placement puzzle game where players must arrange
+ * randomly generated numbers in ascending order on a 4x5 grid.
+ *
+ * <p>Game Features:
+ * <ul>
+ *   <li>4x5 grid of interactive buttons</li>
+ *   <li>Random number generation (1-1000)</li>
+ *   <li>Ascending order placement requirement</li>
+ *   <li>Game statistics tracking</li>
+ *   <li>Customizable UI styling</li>
+ * </ul>
+ *
+ * <p>Game Rules:
+ * <ol>
+ *   <li>Numbers are generated randomly at game start</li>
+ *   <li>Player must place numbers in ascending order</li>
+ *   <li>Game ends when grid is full or order is broken</li>
+ *   <li>Statistics track performance across games</li>
+ * </ol>
+ *
+ * <p>Technical Implementation:
+ * <table border="1">
+ *   <tr><th>Component</th><th>Details</th></tr>
+ *   <tr><td>Grid Layout</td><td>JavaFX GridPane</td></tr>
+ *   <tr><td>UI Styling</td><td>External CSS file</td></tr>
+ *   <tr><td>Game Logic</td><td>Implements GeneralGameLogic interface</td></tr>
+ *   <tr><td>State Tracking</td><td>Counts wins, placements, and games played</td></tr>
+ * </table>
+ *
  * @author Conner Ponton
  * @version 1.0
  */
@@ -23,19 +50,19 @@ public final class NumberGame
         extends Application
         implements GeneralGameLogic
 {
-    private static final int ROWS = 4;
-    private static final int COLS = 5;
-    private static final int TOTAL_SQUARES = ROWS * COLS;
-    private static final int MIN_NUMBER = 1;
-    private static final int MAX_NUMBER = 1000;
-    private static final int INITIAL_STAT = 0;
-    private static final int INITIAL_NUM = -1;
+    private static final int ROWS           = 4;
+    private static final int COLS           = 5;
+    private static final int TOTAL_SQUARES  = ROWS * COLS;
+    private static final int MIN_NUMBER     = 1;
+    private static final int MAX_NUMBER     = 1000;
+    private static final int INITIAL_STAT   = 0;
+    private static final int INITIAL_NUM    = -1;
 
-    private static final int BUTTON_SIZE = 100;
+    private static final int BUTTON_SIZE    = 100;
 
-    private static final int SCENE_WIDTH = 650;
-    private static final int SCENE_HEIGHT = 750;
-    static final String CSS_PATH = "/numberStyle.css";
+    private static final int SCENE_WIDTH    = 650;
+    private static final int SCENE_HEIGHT   = 750;
+    static final String CSS_PATH            = "/numberStyle.css";
 
     private final int[] numbers;
     private int currentNumberIndex;
@@ -48,7 +75,7 @@ public final class NumberGame
     private final Label currentNumberLabel;
 
     /**
-     * Public constructor required by JavaFX.
+     * Public constructor Initializing a new number game instance
      */
     public NumberGame()
     {
@@ -63,8 +90,9 @@ public final class NumberGame
     }
 
     /**
-     * Overrides base start function from application.
-     * @param primaryStage main stage for the game
+     * Initializes the JavaFX application window.
+     *
+     * @param primaryStage The main window container
      */
     @Override
     public void start(final Stage primaryStage)
@@ -171,7 +199,14 @@ public final class NumberGame
     }
 
     /**
-     * Starts a new game by resetting the game state and generating new random numbers.
+     * Starts a new game session with fresh numbers.
+     *
+     * <p>Resets:
+     * <ul>
+     *   <li>Game grid state</li>
+     *   <li>Number sequence</li>
+     *   <li>Placement counters</li>
+     * </ul>
      */
     @Override
     public void startNewGame()
@@ -183,6 +218,65 @@ public final class NumberGame
     }
 
     /**
+     * Displays the game result in an alert window.
+     *
+     * @param won Whether the player won the game.
+     */
+    @Override
+    public void showGameResult(final boolean won)
+    {
+        final GameResultPopup popup;
+        final String scoreMessage;
+        final String resultMessage;
+        resultMessage = won ? "Congratulations! You won the game." : "Game over! You lost.";
+
+        scoreMessage = String.format(
+                "Games Played: %d, Games Won: %d, Successful Placements: %d, Average: %.2f",
+                gamesPlayed, gamesWon, successfulPlacements,
+                (double) successfulPlacements / gamesPlayed
+        );
+
+        popup = new GameResultPopup(resultMessage + "\n\n" + scoreMessage, this);
+        popup.show();
+    }
+
+    /**
+     * Provides access to grid buttons for testing.
+     *
+     * @param x Row index (0-3)
+     * @param y Column index (0-4)
+     * @return The requested button
+     */
+    public Button getGridButtons(final int x,
+                                 final int y)
+    {
+        if (x >= gridButtons.length ||
+                x < INITIAL_STAT ||
+                y >= gridButtons.length ||
+                y < INITIAL_STAT)
+        {
+            throw new IllegalArgumentException("Attempting to get invalid grid button");
+        }
+        return gridButtons[x][y];
+    }
+
+    /**
+     * Ends the current game session with result display.
+     *
+     * @param won true if player successfully filled grid in order
+     */
+    @Override
+    public void endGame(final boolean won)
+    {
+        disableGridButtons();
+        showGameResult(won);
+        if (won)
+        {
+            gamesWon++;
+        }
+    }
+
+    /*
      * Resets the game state.
      */
     private void resetGameState()
@@ -192,7 +286,7 @@ public final class NumberGame
         gamesPlayed++;
     }
 
-    /**
+    /*
      * Enables all buttons in the grid.
      */
     private void enableGridButtons()
@@ -207,7 +301,7 @@ public final class NumberGame
         }
     }
 
-    /**
+    /*
      * Generates random numbers for the game.
      */
     private void generateRandomNumbers()
@@ -220,7 +314,7 @@ public final class NumberGame
         }
     }
 
-    /**
+    /*
      * Updates the status labels.
      */
     private void updateStatusLabels()
@@ -229,7 +323,7 @@ public final class NumberGame
         currentNumberLabel.setText("Current number to place: " + numbers[currentNumberIndex]);
     }
 
-    /**
+    /*
      * Handles button clicks on the grid.
      *
      * @param row The row of the clicked button.
@@ -273,8 +367,8 @@ public final class NumberGame
         }
     }
 
-    /**
-     * Checks if the numbers in the grid are in ascending order.
+    /*
+     * Checks if placed numbers maintain ascending order.
      *
      * @return True if the numbers are in ascending order, false otherwise.
      */
@@ -304,23 +398,7 @@ public final class NumberGame
         return true;
     }
 
-    /**
-     * Ends the game and displays the result.
-     *
-     * @param won Whether the player won the game.
-     */
-    @Override
-    public void endGame(final boolean won)
-    {
-        disableGridButtons();
-        showGameResult(won);
-        if (won)
-        {
-            gamesWon++;
-        }
-    }
-
-    /**
+    /*
      * Disables all buttons in the grid.
      */
     private void disableGridButtons()
@@ -332,45 +410,5 @@ public final class NumberGame
                 gridButtons[row][col].setDisable(true);
             }
         }
-    }
-
-    /**
-     * Displays the game result in an alert window.
-     *
-     * @param won Whether the player won the game.
-     */
-    @Override
-    public void showGameResult(final boolean won)
-    {
-        final GameResultPopup popup;
-        final String scoreMessage;
-        final String resultMessage;
-        resultMessage = won ? "Congratulations! You won the game." : "Game over! You lost.";
-
-        scoreMessage = String.format(
-                "Games Played: %d, Games Won: %d, Successful Placements: %d, Average: %.2f",
-                gamesPlayed, gamesWon, successfulPlacements,
-                (double) successfulPlacements / gamesPlayed
-        );
-
-        popup = new GameResultPopup(resultMessage + "\n\n" + scoreMessage, this);
-        popup.show();
-    }
-
-    /**
-     * Gets specific grid button
-     * @return grid button
-     */
-    public Button getGridButtons(final int x,
-                                 final int y)
-    {
-        if (x >= gridButtons.length ||
-                x < INITIAL_STAT ||
-                y >= gridButtons.length ||
-                y < INITIAL_STAT)
-        {
-            throw new IllegalArgumentException("Attempting to get invalid grid button");
-        }
-        return gridButtons[x][y];
     }
 }

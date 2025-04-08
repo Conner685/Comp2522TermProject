@@ -8,9 +8,33 @@ import java.util.List;
 
 
 /**
- * The Score class represents a player's score in the word game.
- * It tracks game statistics, calculates the total score, and provides methods
- * for reading and writing scores to files.
+ * Immutable class representing a player's score in the word game with persistence capabilities.
+ *
+ * <p>This class handles:
+ * <ul>
+ *   <li>Score calculation and tracking</li>
+ *   <li>File-based score storage and retrieval</li>
+ *   <li>Detailed performance statistics</li>
+ *   <li>Temporal tracking of game sessions</li>
+ * </ul>
+ *
+ * <p>Score Calculation:
+ * <table border="1">
+ *   <tr><th>Attempt Type</th><th>Points</th></tr>
+ *   <tr><td>First Correct</td><td>2 points</td></tr>
+ *   <tr><td>Second Correct</td><td>1 point</td></tr>
+ *   <tr><td>Incorrect</td><td>0 points</td></tr>
+ * </table>
+ *
+ * <p>File Format:
+ * <pre>
+ * Date and Time: [timestamp]
+ * Games Played: [count]
+ * Correct First Attempts: [count]
+ * Correct Second Attempts: [count]
+ * Incorrect Attempts: [count]
+ * Score: [total] points
+ * </pre>
  *
  * @author Conner Ponton
  * @version 1.0
@@ -38,13 +62,13 @@ public final class Score
     private final int score;
 
     /**
-     * Constructs a new Score object with the specified parameters.
+     * Constructs a new score record with game statistics.
      *
-     * @param dateTime The date and time when the score was recorded
-     * @param gamesPlayed The total number of games played
-     * @param correctFirstAttempts The number of correct first attempts
-     * @param correctSecondAttempts The number of correct second attempts
-     * @param incorrectAttempts The number of incorrect attempts
+     * @param dateTime When the game session occurred
+     * @param gamesPlayed Total games played in session
+     * @param correctFirstAttempts Questions solved on first try
+     * @param correctSecondAttempts Questions solved on second try
+     * @param incorrectAttempts Unsolved questions
      */
     public Score(final LocalDateTime dateTime,
                  final int gamesPlayed,
@@ -61,18 +85,6 @@ public final class Score
     }
 
     /**
-     * Calculates the total score based on correct attempts.
-     * First attempts are worth more points than second attempts.
-     *
-     * @return The calculated total score
-     */
-    private int calculateScore()
-    {
-        return (correctFirstAttempts * POINTS_FOR_FIRST_ATTEMPT)
-                + (correctSecondAttempts * POINTS_FOR_SECOND_ATTEMPT);
-    }
-
-    /**
      * Gets the total calculated score.
      *
      * @return The total score
@@ -85,9 +97,8 @@ public final class Score
     /**
      * Appends a score record to the specified file.
      *
-     * @param score The Score object to write to the file
-     * @param fileName The name of the file to append to
-     * @throws IOException If an I/O error occurs while writing to the file
+     * @param score The score to persist
+     * @param fileName Target file path
      */
     public static void appendScoreToFile(final Score score,
                                          final String fileName) throws IOException
@@ -103,33 +114,10 @@ public final class Score
     }
 
     /**
-     * Helper method to read and parse an integer value from a line in the score file.
+     * Reads all scores from a persistence file.
      *
-     * @param reader The BufferedReader to read from
-     * @param prefix The expected prefix of the line being read
-     * @return The parsed integer value
-     * @throws IOException If an I/O error occurs while reading
-     * @throws NumberFormatException If the value after the prefix is not a valid integer
-     */
-    private static int readAndParseInt(final BufferedReader reader,
-                                       final String prefix) throws IOException
-    {
-        final String currLine;
-        final int parsedInt;
-        final String parsedString;
-
-        currLine = reader.readLine();
-        parsedString = currLine.substring(prefix.length());
-        parsedInt = Integer.parseInt(parsedString);
-        return parsedInt;
-    }
-
-    /**
-     * Reads all scores from the specified file and returns them as a list.
-     *
-     * @param fileName The name of the file to read from
-     * @return A list of Score objects read from the file
-     * @throws IOException If an I/O error occurs while reading the file
+     * @param fileName Source file path
+     * @return List of historical scores (chronological order)
      */
     public static List<Score> readScoresFromFile(final String fileName)
                                                 throws IOException
@@ -177,10 +165,9 @@ public final class Score
     }
 
     /**
-     * Formats the score as a string for file storage.
-     * The format includes all score components with appropriate prefixes.
+     * Generates formatted string for file storage.
      *
-     * @return A string representation of the score
+     * @return Multi-line string with all score components
      */
     @Override
     public String toString()
@@ -215,5 +202,37 @@ public final class Score
         result.append("\n");
 
         return result.toString();
+    }
+
+    /*
+     * Calculates the total score based on correct attempts.
+     * First attempts are worth more points than second attempts.
+     *
+     * @return The calculated total score
+     */
+    private int calculateScore()
+    {
+        return (correctFirstAttempts * POINTS_FOR_FIRST_ATTEMPT)
+                + (correctSecondAttempts * POINTS_FOR_SECOND_ATTEMPT);
+    }
+
+    /*
+     * Helper method to read and parse an integer value from a line in the score file.
+     *
+     * @param reader The BufferedReader to read from
+     * @param prefix The expected prefix of the line being read
+     * @return The parsed integer value
+     */
+    private static int readAndParseInt(final BufferedReader reader,
+                                       final String prefix) throws IOException
+    {
+        final String currLine;
+        final int parsedInt;
+        final String parsedString;
+
+        currLine = reader.readLine();
+        parsedString = currLine.substring(prefix.length());
+        parsedInt = Integer.parseInt(parsedString);
+        return parsedInt;
     }
 }

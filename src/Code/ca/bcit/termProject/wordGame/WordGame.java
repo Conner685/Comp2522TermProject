@@ -2,12 +2,37 @@ package ca.bcit.termProject.wordGame;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
 /**
- * A geographical trivia game that tests knowledge of countries, capitals, and facts.
+ * A console-based geographical trivia game that tests knowledge of countries, capitals, and facts.
+ *
+ * <p>The game features:
+ * <ul>
+ *   <li>10 randomly generated questions per session</li>
+ *   <li>3 different question types (country by capital, capital by country, country by fact)</li>
+ *   <li>Multiple-choice format with 3 options</li>
+ *   <li>Two attempts per question with decreasing points</li>
+ *   <li>Persistent score tracking across sessions</li>
+ * </ul>
+ *
+ * <p>Game Mechanics:
+ * <table border="1">
+ *   <tr><th>Feature</th><th>Details</th></tr>
+ *   <tr><td>Points</td><td>2 for first try, 1 for second try</td></tr>
+ *   <tr><td>Questions</td><td>10 per game (random mix of types)</td></tr>
+ *   <tr><td>Answers</td><td>3 options per question (1 correct)</td></tr>
+ *   <tr><td>Facts</td><td>3 per country (randomly selected)</td></tr>
+ * </table>
+ *
+ * <p>Technical Implementation:
+ * <ul>
+ *   <li>Uses {@link World} class for country data</li>
+ *   <li>Persists scores via {@link Score} class</li>
+ *   <li>Console-based I/O with input validation</li>
+ *   <li>Immutable game state during sessions</li>
+ * </ul>
  *
  * @author Conner Ponton
  * @version 1.0
@@ -15,24 +40,24 @@ import java.util.Scanner;
 public final class WordGame
 {
     // Constants
-    private static final int INITIAL_STAT = 0;
-    private static final int FIRST_TRY_PTS = 2;
-    private static final int SECOND_TRY_PTS = 1;
-    private static final int TOTAL_ATTEMPTS = 2;
-    private static final int TOTAL_QUESTIONS = 10;
+    private static final int INITIAL_STAT       = 0;
+    private static final int FIRST_TRY_PTS      = 2;
+    private static final int SECOND_TRY_PTS     = 1;
+    private static final int TOTAL_ATTEMPTS     = 2;
+    private static final int TOTAL_QUESTIONS    = 10;
     private static final int TOTAL_QUESTION_TYPES = 3;
-    private static final int TOTAL_ANSWERS = 3;
-    private static final int TOTAL_FACTS = 3;
-    private static final int FIRST_ANS = 0;
-    private static final int SECOND_ANS = 1;
-    private static final int THIRD_ANS = 2;
-    private static final int FIRST_Q = 0;
-    private static final int SECOND_Q = 1;
-    private static final int THIRD_Q = 2;
-    private static final int ANS_INDEX_SHIFT = 1;
+    private static final int TOTAL_ANSWERS      = 3;
+    private static final int TOTAL_FACTS        = 3;
+    private static final int FIRST_ANS          = 0;
+    private static final int SECOND_ANS         = 1;
+    private static final int THIRD_ANS          = 2;
+    private static final int FIRST_Q            = 0;
+    private static final int SECOND_Q           = 1;
+    private static final int THIRD_Q            = 2;
+    private static final int ANS_INDEX_SHIFT    = 1;
 
-    private static final World COUNTRIES = new World();
-    private static final Scanner INPUT_SCANNER = new Scanner(System.in);
+    private static final World COUNTRIES        = new World();
+    private static final Scanner INPUT_SCANNER  = new Scanner(System.in);
 
     // Game statistics
     private int gamesPlayed;
@@ -47,18 +72,15 @@ public final class WordGame
     }
 
     /**
-     * Resets all game statistics to initial values.
-     */
-    private void resetStats()
-    {
-        this.incorrectAns = INITIAL_STAT;
-        this.secondTryAns = INITIAL_STAT;
-        this.firstTryAns = INITIAL_STAT;
-        this.gamesPlayed = INITIAL_STAT;
-    }
-
-    /**
-     * Displays the game menu and handles game sessions.
+     * Starts the game's main menu interface.
+     *
+     * <p>Handles:
+     * <ul>
+     *   <li>Welcome message display</li>
+     *   <li>Game session initialization</li>
+     *   <li>Player input validation</li>
+     *   <li>Score persistence</li>
+     * </ul>
      */
     public static void wordGameMenu()
     {
@@ -107,7 +129,7 @@ public final class WordGame
         System.out.println(intro);
     }
 
-    /**
+    /*
      * Asks the player if they want to play (again).
      *
      * @param firstTime Whether this is the first time asking
@@ -120,7 +142,7 @@ public final class WordGame
         return getValidInput(prompt, new String[]{"yes", "no"});
     }
 
-    /**
+    /*
      * Ends the game session and displays results.
      *
      * @param session The current game session
@@ -149,8 +171,8 @@ public final class WordGame
         System.out.println(sessionResults);
     }
 
-    /**
-     * Plays a complete word game session with all questions.
+    /*
+     * Executes a complete game session with 10 questions.
      */
     private void playWordGame()
     {
@@ -168,7 +190,7 @@ public final class WordGame
         }
     }
 
-    /**
+    /*
      * Generates a random question type index.
      *
      * @return A random number between 0 and TOTAL_QUESTION_TYPES-1
@@ -178,7 +200,7 @@ public final class WordGame
         return new Random().nextInt(TOTAL_QUESTION_TYPES);
     }
 
-    /**
+    /*
      * Gets valid input from the player.
      *
      * @param prompt The prompt to display
@@ -205,7 +227,7 @@ public final class WordGame
         }
     }
 
-    /**
+    /*
      * Handles the player's guesses for a question.
      *
      * @param guesses The current number of guesses
@@ -229,7 +251,7 @@ public final class WordGame
         }
     }
 
-    /**
+    /*
      * Handles a correct guess.
      *
      * @param guesses The current number of guesses
@@ -252,28 +274,31 @@ public final class WordGame
         }
     }
 
-    /**
+    /*
      * Handles an incorrect guess.
      *
      * @param guesses The current number of guesses
      * @param correctAns The correct answer text
      * @return The updated number of guesses
      */
-    private int handleIncorrectGuess(int guesses,
+    private int handleIncorrectGuess(final int guesses,
                                      final String correctAns)
     {
+        int currGuesses;
+        currGuesses = guesses;
+
         System.out.print("Incorrect! ");
         System.out.println((guesses == FIRST_ANS) ? "try again!\n" : "The answer was " + correctAns);
 
-        guesses++;
-        if (guesses == TOTAL_ATTEMPTS)
+        currGuesses++;
+        if (currGuesses == TOTAL_ATTEMPTS)
         {
             this.incorrectAns++;
         }
-        return guesses;
+        return currGuesses;
     }
 
-    /**
+    /*
      * Identifies a country by its capital city.
      */
     private void identifyCountryByCapital()
@@ -289,13 +314,14 @@ public final class WordGame
                 correctCountry.getCapitalCityName() +
                 displayCountryChoices(countries);
 
-        askQuestion(question, countries, correctCountry.getName());
+        askQuestion(question, correctCountry.getName());
     }
 
-    /**
+    /*
      * Identifies a capital city by its country.
      */
-    private void identifyCapitalByCountry() {
+    private void identifyCapitalByCountry()
+    {
         final Country[] countries;
         final Country correctCountry;
         final String question;
@@ -310,13 +336,14 @@ public final class WordGame
                 "\n3-->" + countries[THIRD_ANS].getCapitalCityName() +
                 "\n\ntype in the corresponding number next to the capital!";
 
-        askQuestion(question, countries, correctCountry.getCapitalCityName());
+        askQuestion(question, correctCountry.getCapitalCityName());
     }
 
-    /**
+    /*
      * Identifies a country by one of its facts.
      */
-    private void identifyCountryByFact() {
+    private void identifyCountryByFact()
+    {
         final Country[] countries;
         final Country correctCountry;
         final String question;
@@ -328,10 +355,10 @@ public final class WordGame
                 correctCountry.getFact(new Random().nextInt(TOTAL_FACTS)) +
                 displayCountryChoices(countries);
 
-        askQuestion(question, countries, correctCountry.getName());
+        askQuestion(question, correctCountry.getName());
     }
 
-    /**
+    /*
      * Prepares an array of countries for a question, with one correct answer.
      *
      * @return Array of countries with one correct answer
@@ -342,7 +369,6 @@ public final class WordGame
         final Country correctCountry;
 
         currentIndex = new Random().nextInt(TOTAL_ANSWERS);
-        System.out.println(currentIndex);
         countries = new Country[TOTAL_ANSWERS];
         correctCountry = COUNTRIES.selectRandCountry();
 
@@ -361,7 +387,7 @@ public final class WordGame
         return countries;
     }
 
-    /**
+    /*
      * Displays the country choices for a question.
      *
      * @param countries The array of countries to display
@@ -375,19 +401,16 @@ public final class WordGame
                 "\n\ntype in the corresponding number next to the country!";
     }
 
-    /**
+    /*
      * Asks a question and handles the player's response.
      *
      * @param question The question to ask
-     * @param countries The array of countries
      * @param correctAnswer The correct answer text
      */
     private void askQuestion(final String question,
-                             final Country[] countries,
                              final String correctAnswer)
     {
         int guesses;
-        final int correctIndex;
 
         guesses = INITIAL_STAT;
 
@@ -398,5 +421,16 @@ public final class WordGame
             playerInput = getValidInput(question, new String[]{"1", "2", "3"});
             guesses = handleQuestionGuesses(guesses, playerInput, currentIndex, correctAnswer);
         } while (guesses < TOTAL_ATTEMPTS);
+    }
+
+    /*
+     * Resets all game statistics to initial values.
+     */
+    private void resetStats()
+    {
+        this.incorrectAns = INITIAL_STAT;
+        this.secondTryAns = INITIAL_STAT;
+        this.firstTryAns = INITIAL_STAT;
+        this.gamesPlayed = INITIAL_STAT;
     }
 }

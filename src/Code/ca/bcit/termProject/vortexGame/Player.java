@@ -1,23 +1,81 @@
 package ca.bcit.termProject.vortexGame;
 
 /**
- * Represents a player in the game that can move and use a boost mechanic.
+ * Represents the player character with movement and boost mechanics.
+ *
+ * <p>The player is the main controllable entity featuring:
+ * <ul>
+ *   <li>Four-directional movement (WASD controls)</li>
+ *   <li>Boost system with resource management</li>
+ *   <li>Modifiable speed and boost capacity</li>
+ *   <li>Screen boundary constraints</li>
+ * </ul>
+ *
+ * <p>Core Attributes:
+ * <table border="1">
+ *   <tr><th>Attribute</th><th>Value</th></tr>
+ *   <tr><td>Base Speed</td><td>5 units/frame</td></tr>
+ *   <tr><td>Boost Speed</td><td>10 units/frame</td></tr>
+ *   <tr><td>Initial Boost</td><td>200 units</td></tr>
+ *   <tr><td>Boost Drain</td><td>4 units/frame</td></tr>
+ *   <tr><td>Boost Regen</td><td>1 unit/frame</td></tr>
+ * </table>
+ *
+ * <p>State Management:
+ * <ul>
+ *   <li>Boost cut-off at 50% capacity</li>
+ *   <li>Speed modifier stackable with power-ups</li>
+ *   <li>Full stat reset capability</li>
+ * </ul>
  *
  * @author Conner Ponton
  * @version 1.0
  */
 public final class Player extends GameObject
 {
+    /**
+     * Base movement speed without boosting (units/frame).
+     *
+     * <p>Applied when:
+     * <ul>
+     *   <li>Moving without shift key</li>
+     *   <li>Boost is depleted</li>
+     *   <li>In boost cut-off state</li>
+     * </ul>
+     */
     static final int SPEED = 5;
+
+    /**
+     * Boosted movement speed multiplier (units/frame).
+     *
+     * <p>Only active when:
+     * <ul>
+     *   <li>Shift key is pressed</li>
+     *   <li>Boost is available</li>
+     *   <li>Not in cut-off state</li>
+     * </ul>
+     */
     static final int BOOST_SPEED = 10;
-    public static final int INITIAL_BOOST_LIMIT = 200;
+
+    /**
+     * Initial boost limit for the boost bar.
+     */
+    static final int INITIAL_BOOST_LIMIT = 200;
+
+    /**
+     * Boost drain speed when boost is activated
+     */
     static final int BOOST_DRAIN = 4;
-    static final int BOOST_REGEN = 1;
-    private static final int BOOST_MIN = 0;
-    private static final int BOOST_CUT_OFF = INITIAL_BOOST_LIMIT / 2;
-    private static final int DELTA_START = 0;
+
+    /**
+     * Boost regen speed when boost is not active
+     */
+    static final int BOOST_REGEN                = 1;
+    private static final int BOOST_MIN          = 0;
+    private static final int BOOST_CUT_OFF      = INITIAL_BOOST_LIMIT / 2;
+    private static final int DELTA_START        = 0;
     private static final int STARTING_SPEED_MOD = 1;
-    private static final int MIN_BOUND = 0;
+    private static final int MIN_BOUND          = 0;
 
     private int currentBoost;
     private boolean boostCut;
@@ -25,11 +83,19 @@ public final class Player extends GameObject
     private int boostLimit;
 
     /**
-     * Constructs a Player with the specified position and size.
+     * Constructs a new player at specified coordinates.
      *
-     * @param x    the x-coordinate of the player
-     * @param y    the y-coordinate of the player
-     * @param size the size of the player
+     * <p>Initial state includes:
+     * <ul>
+     *   <li>Full boost capacity</li>
+     *   <li>Base speed modifier</li>
+     *   <li>CSS class "player" for styling</li>
+     *   <li>Active boost system</li>
+     * </ul>
+     *
+     * @param x The horizontal spawn coordinate
+     * @param y The vertical spawn coordinate
+     * @param size The player's collision diameter
      */
     public Player(final double x,
                   final double y,
@@ -37,6 +103,7 @@ public final class Player extends GameObject
     {
         super(x, y, size);
         validateCoordinates(x, y);
+        
         this.currentBoost = INITIAL_BOOST_LIMIT;
         this.boostCut = false;
         this.speedModifier = STARTING_SPEED_MOD;
@@ -45,19 +112,27 @@ public final class Player extends GameObject
     }
 
     /**
-     * Updates the player's movement based on input and boost state.
+     * Updates player position and boost state based on input.
      *
-     * @param isWPressed     whether the W key is pressed
-     * @param isSPressed     whether the S key is pressed
-     * @param isAPressed     whether the A key is pressed
-     * @param isDPressed     whether the D key is pressed
-     * @param isShiftPressed whether the Shift key is pressed
+     * <p>Handles:
+     * <ul>
+     *   <li>Movement input processing</li>
+     *   <li>Boost resource management</li>
+     *   <li>Speed modification application</li>
+     *   <li>Screen boundary enforcement</li>
+     * </ul>
+     *
+     * @param WPressed W key state
+     * @param SPressed S key state
+     * @param APressed A key state
+     * @param isDPressed D key state
+     * @param ShiftPressed Shift key state
      */
-    public void updateMovement(final boolean isWPressed,
-                               final boolean isSPressed,
-                               final boolean isAPressed,
+    public void updateMovement(final boolean WPressed,
+                               final boolean SPressed,
+                               final boolean APressed,
                                final boolean isDPressed,
-                               boolean isShiftPressed)
+                               boolean ShiftPressed)
     {
         double deltaX;
         double deltaY;
@@ -65,7 +140,7 @@ public final class Player extends GameObject
          deltaX = DELTA_START;
          deltaY = DELTA_START;
 
-        if (isShiftPressed && !boostCut)
+        if (ShiftPressed && !boostCut)
         {
             currentBoost -= BOOST_DRAIN;
             if (currentBoost < BOOST_MIN)
@@ -90,14 +165,14 @@ public final class Player extends GameObject
         if (currentBoost == BOOST_MIN ||
                 boostCut)
         {
-            isShiftPressed = false;
+            ShiftPressed = false;
             boostCut = true;
         }
 
-        if (isWPressed) deltaY -= isShiftPressed ? BOOST_SPEED : SPEED;
-        if (isSPressed) deltaY += isShiftPressed ? BOOST_SPEED : SPEED;
-        if (isAPressed) deltaX -= isShiftPressed ? BOOST_SPEED : SPEED;
-        if (isDPressed) deltaX += isShiftPressed ? BOOST_SPEED : SPEED;
+        if (WPressed) deltaY -= ShiftPressed ? BOOST_SPEED : SPEED;
+        if (SPressed) deltaY += ShiftPressed ? BOOST_SPEED : SPEED;
+        if (APressed) deltaX -= ShiftPressed ? BOOST_SPEED : SPEED;
+        if (isDPressed) deltaX += ShiftPressed ? BOOST_SPEED : SPEED;
 
         deltaX *= speedModifier;
         deltaY *= speedModifier;
@@ -105,12 +180,14 @@ public final class Player extends GameObject
         move(deltaX, deltaY);
 
         // Prevent moving out of screen bounds
-        setX(Math.max(DELTA_START, Math.min(getX(), VortexGameEngine.SCREEN_WIDTH - getWidth())));
-        setY(Math.max(DELTA_START, Math.min(getY(), VortexGameEngine.SCREEN_HEIGHT - getHeight())));
+        setX(Math.max(DELTA_START, Math.min(getX(), VortexGameEngine.SCREEN_WIDTH_PX - getWidth())));
+        setY(Math.max(DELTA_START, Math.min(getY(), VortexGameEngine.SCREEN_HEIGHT_PX - getHeight())));
     }
 
     /**
-     * Resets the player's boost level to the maximum limit.
+     * Fully restores boost resource to maximum capacity.
+     *
+     * <p>Also clears any active boost cut-off state.
      */
     public void resetBoost()
     {
@@ -118,7 +195,7 @@ public final class Player extends GameObject
     }
 
     /**
-     * Resets the player's stats to the initial
+     * Resets the player's stats to the initial stats
      */
     public void resetStats()
     {
@@ -128,9 +205,9 @@ public final class Player extends GameObject
     }
 
     /**
-     * Gets the current user boost
+     * Gets the current boost resource level.
      *
-     * @return current boost
+     * @return Current boost units (0 to boostLimit)
      */
     public int getBoost()
     {
@@ -138,9 +215,9 @@ public final class Player extends GameObject
     }
 
     /**
-     * Gets the max user boost
+     * Gets the maximum boost capacity.
      *
-     * @return max boost
+     * @return Current maximum boost units
      */
     public int getMaxBoost()
     {
@@ -148,9 +225,9 @@ public final class Player extends GameObject
     }
 
     /**
-     * Returns if the user can use boost
+     * Checks if boost is temporarily disabled.
      *
-     * @return boostCut
+     * @return true if in boost cut-off state
      */
     public boolean isBoostCut()
     {
@@ -158,8 +235,10 @@ public final class Player extends GameObject
     }
 
     /**
-     * Increments the speed modifier
-     * @param increment amount to modify speed by
+     /**
+     * Modifies the player's speed multiplier.
+     *
+     * @param increment Value to add to speed modifier
      */
     public void IncrementSpeedMod(final double increment)
     {
@@ -167,8 +246,9 @@ public final class Player extends GameObject
     }
 
     /**
-     * Increments the boost limit
-     * @param increment amount to increase boost limit by
+     * Modifies the player's maximum boost capacity.
+     *
+     * @param increment Value to add to boost limit
      */
     public void IncrementBoostMod(final int increment)
     {
@@ -186,7 +266,7 @@ public final class Player extends GameObject
         return speedModifier;
     }
 
-    /**
+    /*
      * Validates player to spawn within proper bounds
      *
      * @param x of player
@@ -196,9 +276,9 @@ public final class Player extends GameObject
                                             final double y)
     {
         if (x < MIN_BOUND ||
-                x > VortexGameEngine.SCREEN_WIDTH ||
+                x > VortexGameEngine.SCREEN_WIDTH_PX ||
                 y < MIN_BOUND ||
-                y >= VortexGameEngine.SCREEN_HEIGHT)
+                y >= VortexGameEngine.SCREEN_HEIGHT_PX)
         {
             throw new IllegalArgumentException("Invalid coordinates");
         }
