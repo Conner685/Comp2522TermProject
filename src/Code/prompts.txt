@@ -1,0 +1,85 @@
+How I Used AI
+
+    Code Comments & Documentation
+        Generated detailed Javadoc comments, reducing manual effort while maintaining accuracy.
+        Ensured consistency in documentation style across classes.
+
+    Project Structuring & Outlining
+        Assisted in organizing methods logically (e.g., grouping related functions).
+        Suggested architectural improvements (e.g., separating game logic from UI).
+
+    Refactoring & Optimization
+        Identified redundant code and suggested cleaner implementations.
+        Proposed efficiency improvements (e.g., using HashMap for O(1) lookups).
+
+    Troubleshooting & Debugging
+        Explained runtime errors and suggested fixes (though not always correct).
+        Helped trace logical flaws in algorithms (e.g., scoring systems).
+
+    Bulk Code Generation
+        Automated repetitive tasks (e.g., getters/setters, JUnit test stubs).
+        Provided template implementations for common patterns (e.g., game loops).
+
+Advantages of Using AI
+
+    Error Detection
+        Caught subtle bugs I might have missed (e.g., unvalidated inputs).
+
+    Efficiency in Tedious Tasks
+        Rapidly generated boilerplate code (e.g., file I/O operations).
+
+    Formatted documentation, saving hours of manual work.
+
+    Learning Aid
+        Explained complex concepts (e.g., JavaFX threading).
+
+    Provided alternative implementations for comparison.
+
+    Debugging Assistant
+        Clarified stack traces and suggested potential fixes.
+
+Limitations & Challenges
+
+    Unreliable Code Generation
+        Rarely produced "plug-and-play" solutions—required heavy debugging.
+        Often misunderstood requirements, leading to incorrect implementations.
+
+    Debugging Overhead
+        Spent significant time fixing AI-generated code.
+        Had to manually integrate snippets into the larger system.
+
+    Superficial Understanding
+        Struggled with project-specific constraints (e.g., game rules).
+        Offered generic solutions that didn’t always fit the context.
+
+    Annoying "Empathy"
+        Irritating placeholder phrases ("I understand your frustration") when its own code failed.
+
+Key Takeaways
+
+    Not a Shortcut (Yet)
+        AI didn’t accelerate completion time due to debugging overhead.
+        Future use will likely be faster as I learn to guide it better.
+
+    Debugging Skills Are Critical
+        AI is useless if you can’t validate/fix its output.
+        Deep understanding of the codebase remains essential.
+
+    AI as a Tool, Not a Replacement
+        Enhances productivity but can’t replace problem-solving skills.
+        Best used for repetitive tasks or as a "pair programmer."
+
+    Ethical & Effective Use
+        Avoid over-reliance—use it to augment (not replace) learning.
+        Verify all generated code to ensure correctness.
+
+Will I Use AI Again?
+
+Yes, but strategically:
+    For repetitive tasks: Documentation, boilerplate code, and unit tests.
+    As a learning tool: To explore alternative implementations.
+    With caution: Always reviewing and testing its output.
+
+Final Thoughts:
+AI won’t replace developers, but developers who leverage AI effectively will have an edge. My goal is to use it as a
+productivity multiplier while maintaining full ownership of the code.
